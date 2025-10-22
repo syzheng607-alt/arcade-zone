@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ArcadeZone - Ultimate Gaming Portal</title>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&family=Press+Start+2P&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Animation Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/typed.js/2.0.12/typed.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/js/splide.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/css/splide.min.css" rel="stylesheet">
+    <script src="https://unpkg.com/splitting@1.0.6/dist/splitting.min.js"></script>
+    <link href="https://unpkg.com/splitting@1.0.6/dist/splitting.css" rel="stylesheet">
+    
+    <style>
+        :root {
+            --dark-green: #1a4d2e;
+            --light-green: #4a7c59;
+            --orange: #ff6b35;
+            --dark-orange: #e55a2b;
+            --black: #0a0a0a;
+            --gray: #2d2d2d;
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--dark-green) 0%, var(--black) 100%);
+            font-family: 'Rajdhani', sans-serif;
+            color: white;
+            overflow-x: hidden;
+        }
+        
+        .orbitron { font-family: 'Orbitron', monospace; }
+        .press-start { font-family: 'Press Start 2P', cursive; }
+        
+        .neon-glow {
+            text-shadow: 0 0 10px var(--orange), 0 0 20px var(--orange), 0 0 30px var(--orange);
+        }
+        
+        .game-block {
+            background: linear-gradient(145deg, var(--dark-green), var(--light-green));
+            border: 2px solid var(--orange);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .game-block:hover {
+            transform: perspective(1000px) rotateX(5deg) rotateY(5deg) scale(1.05);
+            box-shadow: 0 10px 30px rgba(255, 107, 53, 0.5);
+            border-color: var(--dark-orange);
+        }
+        
+        .game-block::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255, 107, 53, 0.1), transparent);
+            transform: rotate(45deg);
+            transition: all 0.5s;
+            opacity: 0;
+        }
+        
+        .game-block:hover::before {
+            opacity: 1;
+            animation: shine 0.5s ease-in-out;
+        }
+        
+        @keyframes shine {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+        }
+        
+        .play-button {
+            background: linear-gradient(45deg, var(--orange), var(--dark-orange));
+            border: none;
+            color: var(--black);
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+        }
+        
+        .play-button:hover {
+            background: linear-gradient(45deg, var(--dark-orange), var(--orange));
+            transform: scale(1.1);
+            box-shadow: 0 5px 15px rgba(255, 107, 53, 0.4);
+        }
+        
+        .nav-link {
+            position: relative;
+            color: white;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        
+        .nav-link:hover {
+            color: var(--orange);
+        }
+        
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--orange);
+            transition: width 0.3s ease;
+        }
+        
+        .nav-link:hover::after {
+            width: 100%;
+        }
+        
+        .banner-carousel {
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid var(--orange);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        .splide__arrow {
+            background: var(--orange) !important;
+            opacity: 0.8;
+        }
+        
+        .splide__arrow:hover {
+            opacity: 1;
+        }
+        
+        .splide__pagination__page.is-active {
+            background: var(--orange) !important;
+        }
+        
+        .stats-card {
+            background: linear-gradient(145deg, var(--gray), var(--dark-green));
+            border: 1px solid var(--orange);
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .particle-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.3;
+        }
+        
+        .typing-text {
+            color: var(--orange);
+            font-size: 2.5rem;
+            font-weight: 900;
+        }
+        
+        @media (max-width: 768px) {
+            .typing-text {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Particle Background -->
+    <div class="particle-bg" id="particles"></div>
+    
+    <!-- Navigation -->
+    <nav class="bg-black bg-opacity-80 backdrop-blur-sm fixed w-full top-0 z-50 border-b border-orange">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <h1 class="text-2xl font-bold orbitron neon-glow">ArcadeZone</h1>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-8">
+                        <a href="index.html" class="nav-link font-semibold">Home</a>
+                        <a href="games.html" class="nav-link font-semibold">Games</a>
+                        <a href="purchase.html" class="nav-link font-semibold">Purchase</a>
+                        <a href="contact.html" class="nav-link font-semibold">Contact Us</a>
+                    </div>
+                </div>
+                <div class="md:hidden">
+                    <button id="mobile-menu-btn" class="text-white hover:text-orange">
+                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Mobile menu -->
+        <div id="mobile-menu" class="md:hidden hidden bg-black bg-opacity-95">
+            <div class="px-2 pt-2 pb-3 space-y-1">
+                <a href="index.html" class="nav-link block px-3 py-2 font-semibold">Home</a>
+                <a href="games.html" class="nav-link block px-3 py-2 font-semibold">Games</a>
+                <a href="purchase.html" class="nav-link block px-3 py-2 font-semibold">Purchase</a>
+                <a href="contact.html" class="nav-link block px-3 py-2 font-semibold">Contact Us</a>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Hero Section with Banners -->
+    <section class="pt-20 pb-12 px-4">
+        <div class="max-w-7xl mx-auto">
+            <!-- Typing Text -->
+            <div class="text-center mb-12">
+                <h2 class="typing-text orbitron" id="typed-text"></h2>
+                <p class="text-xl text-gray-300 mt-4 max-w-2xl mx-auto">
+                    Discover the ultimate collection of arcade games. From classic retro to modern masterpieces, 
+                    experience gaming like never before.
+                </p>
+            </div>
+            
+            <!-- Banner Carousel -->
+            <div class="banner-carousel mb-16">
+                <div class="splide" id="banner-carousel">
+                    <div class="splide__track">
+                        <ul class="splide__list">
+                            <li class="splide__slide">
+                                <div class="relative h-64 md:h-96">
+                                    <img src="resources/banner1.jpg" alt="Space Shooter Game" class="w-full h-full object-cover">
+                                    <div class="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
+                                        <div class="text-center">
+                                            <h3 class="text-4xl md:text-6xl font-bold orbitron text-white mb-4">SPACE DEFENDER</h3>
+                                            <p class="text-lg md:text-xl text-gray-200 mb-6">Epic space battles await</p>
+                                            <button class="play-button px-8 py-3 rounded-lg text-lg font-bold">PLAY NOW</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="splide__slide">
+                                <div class="relative h-64 md:h-96">
+                                    <img src="resources/banner2.jpg" alt="Fantasy Adventure" class="w-full h-full object-cover">
+                                    <div class="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
+                                        <div class="text-center">
+                                            <h3 class="text-4xl md:text-6xl font-bold orbitron text-white mb-4">MYSTIC REALMS</h3>
+                                            <p class="text-lg md:text-xl text-gray-200 mb-6">Embark on legendary quests</p>
+                                            <button class="play-button px-8 py-3 rounded-lg text-lg font-bold">PLAY NOW</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="splide__slide">
+                                <div class="relative h-64 md:h-96">
+                                    <img src="resources/banner3.jpg" alt="Cyber Racing" class="w-full h-full object-cover">
+                                    <div class="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
+                                        <div class="text-center">
+                                            <h3 class="text-4xl md:text-6xl font-bold orbitron text-white mb-4">NEON RACER</h3>
+                                            <p class="text-lg md:text-xl text-gray-200 mb-6">Race through cyberpunk streets</p>
+                                            <button class="play-button px-8 py-3 rounded-lg text-lg font-bold">PLAY NOW</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Game Grid Section -->
+    <section class="py-16 px-4">
+        <div class="max-w-7xl mx-auto">
+            <h2 class="text-4xl font-bold orbitron text-center mb-12 neon-glow">Featured Games</h2>
+            
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+                <!-- Game Block 1 -->
+                <div class="game-block rounded-lg overflow-hidden">
+                    <img src="resources/game1.jpg" alt="Space Shooter" class="w-full h-48 object-cover">
+                    <div class="p-4">
+                        <h3 class="text-xl font-bold mb-2 orbitron">Space Defender</h3>
+                        <p class="text-gray-300 text-sm mb-4">Epic space battles await in this thrilling shooter experience.</p>
+                        <button class="play-button w-full py-2 rounded-lg font-bold">PLAY</button>
+                    </div>
+                </div>
+                
+                <!-- Game Block 2 -->
+                <div class="game-block rounded-lg overflow-hidden">
+                    <img src="resources/game2.jpg" alt="Pixel Adventure" class="w-full h-48 object-cover">
+                    <div class="p-4">
+                        <h3 class="text-xl font-bold mb-2 orbitron">Pixel Quest</h3>
+                        <p class="text-gray-300 text-sm mb-4">Retro-style adventure through pixelated worlds.</p>
+                        <button class="play-button w-full py-2 rounded-lg font-bold">PLAY</button>
+                    </div>
+                </div>
+                
+                <!-- Game Block 3 -->
+                <div class="game-block rounded-lg overflow-hidden">
+                    <img src="resources/game3.jpg" alt="Retro Arcade" class="w-full h-48 object-cover">
+                    <div class="p-4">
+                        <h3 class="text-xl font-bold mb-2 orbitron">Retro Blaster</h3>
+                        <p class="text-gray-300 text-sm mb-4">Classic arcade action with modern twists.</p>
+                        <button class="play-button w-full py-2 rounded-lg font-bold">PLAY</button>
+                    </div>
+                </div>
+                
+                <!-- Game Block 4 -->
+                <div class="game-block rounded-lg overflow-hidden">
+                    <img src="resources/game4.jpg" alt="Pixel Warriors" class="w-full h-48 object-cover">
+                    <div class="p-4">
+                        <h3 class="text-xl font-bold mb-2 orbitron">Pixel Warriors</h3>
+                        <p class="text-gray-300 text-sm mb-4">Battle through pixelated arenas.</p>
+                        <button class="play-button w-full py-2 rounded-lg font-bold">PLAY</button>
+                    </div>
+                </div>
+                
+                <!-- Game Block 5 -->
+                <div class="game-block rounded-lg overflow-hidden">
+                    <img src="resources/game5.jpg" alt="Adventure Land" class="w-full h-48 object-cover">
+                    <div class="p-4">
+                        <h3 class="text-xl font-bold mb-2 orbitron">Adventure Land</h3>
+                        <p class="text-gray-300 text-sm mb-4">Explore vast fantasy worlds.</p>
+                        <button class="play-button w-full py-2 rounded-lg font-bold">PLAY</button>
+                    </div>
+                </div>
+                
+                <!-- Game Block 6 -->
+                <div class="game-block rounded-lg overflow-hidden">
+                    <img src="resources/game6.jpg" alt="Neon Streets" class="w-full h-48 object-cover">
+                    <div class="p-4">
+                        <h3 class="text-xl font-bold mb-2 orbitron">Neon Streets</h3>
+                        <p class="text-gray-300 text-sm mb-4">Cyberpunk action in neon-lit cities.</p>
+                        <button class="play-button w-full py-2 rounded-lg font-bold">PLAY</button>
+                    </div>
+                </div>
+                
+                <!-- Game Block 7 -->
+                <div class="game-block rounded-lg overflow-hidden">
+                    <img src="resources/game7.jpg" alt="Game Interface" class="w-full h-48 object-cover">
+                    <div class="p-4">
+                        <h3 class="text-xl font-bold mb-2 orbitron">System Hack</h3>
+                        <p class="text-gray-300 text-sm mb-4">Infiltrate digital systems in this hacking game.</p>
+                        <button class="play-button w-full py-2 rounded-lg font-bold">PLAY</button>
+                    </div>
+                </div>
+                
+                <!-- Game Block 8 -->
+                <div class="game-block rounded-lg overflow-hidden">
+                    <img src="resources/game8.jpg" alt="Retro Game" class="w-full h-48 object-cover">
+                    <div class="p-4">
+                        <h3 class="text-xl font-bold mb-2 orbitron">8-Bit Heroes</h3>
+                        <p class="text-gray-300 text-sm mb-4">Classic 8-bit adventure gameplay.</p>
+                        <button class="play-button w-full py-2 rounded-lg font-bold">PLAY</button>
+                    </div>
+                </div>
+                
+                <!-- Game Block 9 -->
+                <div class="game-block rounded-lg overflow-hidden">
+                    <img src="resources/game9.jpg" alt="Arcade Classic" class="w-full h-48 object-cover">
+                    <div class="p-4">
+                        <h3 class="text-xl font-bold mb-2 orbitron">Arcade Classic</h3>
+                        <p class="text-gray-300 text-sm mb-4">Authentic arcade cabinet experience.</p>
+                        <button class="play-button w-full py-2 rounded-lg font-bold">PLAY</button>
+                    </div>
+                </div>
+                
+                <!-- Game Block 10 -->
+                <div class="game-block rounded-lg overflow-hidden">
+                    <img src="resources/game10.jpg" alt="Puzzle Master" class="w-full h-48 object-cover">
+                    <div class="p-4">
+                        <h3 class="text-xl font-bold mb-2 orbitron">Puzzle Master</h3>
+                        <p class="text-gray-300 text-sm mb-4">Challenge your mind with complex puzzles.</p>
+                        <button class="play-button w-full py-2 rounded-lg font-bold">PLAY</button>
+                    </div>
+                </div>
+                
+                <!-- Game Block 11 -->
+                <div class="game-block rounded-lg overflow-hidden">
+                    <img src="resources/game11.jpg" alt="Indie Adventure" class="w-full h-48 object-cover">
+                    <div class="p-4">
+                        <h3 class="text-xl font-bold mb-2 orbitron">Indie Adventure</h3>
+                        <p class="text-gray-300 text-sm mb-4">Unique indie gaming experience.</p>
+                        <button class="play-button w-full py-2 rounded-lg font-bold">PLAY</button>
+                    </div>
+                </div>
+                
+                <!-- Game Block 12 -->
+                <div class="game-block rounded-lg overflow-hidden">
+                    <img src="resources/game12.jpg" alt="Social Game" class="w-full h-48 object-cover">
+                    <div class="p-4">
+                        <h3 class="text-xl font-bold mb-2 orbitron">Space Crew</h3>
+                        <p class="text-gray-300 text-sm mb-4">Work together or deceive your crew.</p>
+                        <button class="play-button w-full py-2 rounded-lg font-bold">PLAY</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Statistics Section -->
+    <section class="py-16 px-4">
+        <div class="max-w-7xl mx-auto">
+            <h2 class="text-4xl font-bold orbitron text-center mb-12 neon-glow">Gaming Stats</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="stats-card">
+                    <div class="text-4xl font-bold orbitron text-orange mb-2" id="games-count">0</div>
+                    <div class="text-lg font-semibold">Games Available</div>
+                </div>
+                
+                <div class="stats-card">
+                    <div class="text-4xl font-bold orbitron text-orange mb-2" id="players-count">0</div>
+                    <div class="text-lg font-semibold">Active Players</div>
+                </div>
+                
+                <div class="stats-card">
+                    <div class="text-4xl font-bold orbitron text-orange mb-2" id="hours-count">0</div>
+                    <div class="text-lg font-semibold">Hours Played</div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Footer -->
+    <footer class="bg-black bg-opacity-80 border-t border-orange py-12 px-4">
+        <div class="max-w-7xl mx-auto text-center">
+            <div class="mb-8">
+                <h3 class="text-2xl font-bold orbitron neon-glow mb-4">ArcadeZone</h3>
+                <p class="text-gray-400 max-w-2xl mx-auto">
+                    Your ultimate destination for arcade gaming. Experience the thrill of classic and modern games 
+                    in one comprehensive platform.
+                </p>
+            </div>
+            
+            <div class="flex justify-center space-x-8 mb-8">
+                <a href="index.html" class="nav-link font-semibold">Home</a>
+                <a href="games.html" class="nav-link font-semibold">Games</a>
+                <a href="purchase.html" class="nav-link font-semibold">Purchase</a>
+                <a href="contact.html" class="nav-link font-semibold">Contact Us</a>
+            </div>
+            
+            <div class="border-t border-gray-700 pt-8">
+                <p class="text-gray-400">
+                    © 2024 ArcadeZone. All rights reserved. Built with passion for gaming.
+                </p>
+            </div>
+        </div>
+    </footer>
+    
+    <script src="main.js"></script>
+</body>
+</html>

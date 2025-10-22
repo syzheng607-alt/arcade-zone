@@ -1,0 +1,16 @@
+# Vercel
+.vercel
+
+# Environment variables
+.env*.local
+.env
+
+# macOS
+.DS_Store
+desktop.ini
+
+# Logs
+*.log
+npm-debug.log*
+
+

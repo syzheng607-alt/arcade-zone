@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us - ArcadeZone</title>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&family=Press+Start+2P&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Animation Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    
+    <style>
+        :root {
+            --dark-green: #1a4d2e;
+            --light-green: #4a7c59;
+            --orange: #ff6b35;
+            --dark-orange: #e55a2b;
+            --black: #0a0a0a;
+            --gray: #2d2d2d;
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--dark-green) 0%, var(--black) 100%);
+            font-family: 'Rajdhani', sans-serif;
+            color: white;
+            overflow-x: hidden;
+        }
+        
+        .orbitron { font-family: 'Orbitron', monospace; }
+        .press-start { font-family: 'Press Start 2P', cursive; }
+        
+        .neon-glow {
+            text-shadow: 0 0 10px var(--orange), 0 0 20px var(--orange), 0 0 30px var(--orange);
+        }
+        
+        .contact-card {
+            background: linear-gradient(145deg, var(--dark-green), var(--light-green));
+            border: 2px solid var(--gray);
+            transition: all 0.3s ease;
+        }
+        
+        .contact-card:hover {
+            border-color: var(--orange);
+            box-shadow: 0 10px 30px rgba(255, 107, 53, 0.3);
+        }
+        
+        .form-input {
+            background: var(--gray);
+            border: 2px solid var(--gray);
+            color: white;
+            transition: all 0.3s ease;
+        }
+        
+        .form-input:focus {
+            border-color: var(--orange);
+            outline: none;
+            box-shadow: 0 0 10px rgba(255, 107, 53, 0.3);
+        }
+        
+        .form-textarea {
+            background: var(--gray);
+            border: 2px solid var(--gray);
+            color: white;
+            transition: all 0.3s ease;
+            resize: vertical;
+            min-height: 120px;
+        }
+        
+        .form-textarea:focus {
+            border-color: var(--orange);
+            outline: none;
+            box-shadow: 0 0 10px rgba(255, 107, 53, 0.3);
+        }
+        
+        .nav-link {
+            position: relative;
+            color: white;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        
+        .nav-link:hover {
+            color: var(--orange);
+        }
+        
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--orange);
+            transition: width 0.3s ease;
+        }
+        
+        .nav-link:hover::after {
+            width: 100%;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(45deg, var(--orange), var(--dark-orange));
+            border: none;
+            color: var(--black);
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(45deg, var(--dark-orange), var(--orange));
+            transform: scale(1.05);
+        }
+        
+        .faq-item {
+            background: var(--gray);
+            border: 1px solid var(--gray);
+            border-radius: 8px;
+            margin-bottom: 12px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .faq-item.active {
+            border-color: var(--orange);
+        }
+        
+        .faq-question {
+            padding: 20px;
+            cursor: pointer;
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+        
+        .faq-question:hover {
+            background: rgba(255, 107, 53, 0.1);
+        }
+        
+        .faq-answer {
+            padding: 0 20px;
+            max-height: 0;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .faq-item.active .faq-answer {
+            max-height: 200px;
+            padding: 0 20px 20px;
+        }
+        
+        .faq-icon {
+            transition: transform 0.3s ease;
+        }
+        
+        .faq-item.active .faq-icon {
+            transform: rotate(180deg);
+        }
+        
+        .particle-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.3;
+        }
+        
+        .info-card {
+            background: linear-gradient(145deg, var(--gray), var(--dark-green));
+            border: 1px solid var(--orange);
+            border-radius: 10px;
+            padding: 24px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        .info-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(255, 107, 53, 0.3);
+        }
+        
+        .live-chat {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--orange);
+            color: var(--black);
+            border-radius: 50px;
+            padding: 16px 24px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+        
+        .live-chat:hover {
+            background: var(--dark-orange);
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+    <!-- Particle Background -->
+    <div class="particle-bg" id="particles"></div>
+    
+    <!-- Navigation -->
+    <nav class="bg-black bg-opacity-80 backdrop-blur-sm fixed w-full top-0 z-50 border-b border-orange">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <h1 class="text-2xl font-bold orbitron neon-glow">ArcadeZone</h1>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-8">
+                        <a href="index.html" class="nav-link font-semibold">Home</a>
+                        <a href="games.html" class="nav-link font-semibold">Games</a>
+                        <a href="purchase.html" class="nav-link font-semibold">Purchase</a>
+                        <a href="contact.html" class="nav-link font-semibold text-orange">Contact Us</a>
+                    </div>
+                </div>
+                <div class="md:hidden">
+                    <button id="mobile-menu-btn" class="text-white hover:text-orange">
+                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Mobile menu -->
+        <div id="mobile-menu" class="md:hidden hidden bg-black bg-opacity-95">
+            <div class="px-2 pt-2 pb-3 space-y-1">
+                <a href="index.html" class="nav-link block px-3 py-2 font-semibold">Home</a>
+                <a href="games.html" class="nav-link block px-3 py-2 font-semibold">Games</a>
+                <a href="purchase.html" class="nav-link block px-3 py-2 font-semibold">Purchase</a>
+                <a href="contact.html" class="nav-link block px-3 py-2 font-semibold text-orange">Contact Us</a>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Header Section -->
+    <section class="pt-24 pb-12 px-4">
+        <div class="max-w-7xl mx-auto text-center">
+            <h1 class="text-5xl font-bold orbitron neon-glow mb-4">Contact Us</h1>
+            <p class="text-xl text-gray-300 max-w-2xl mx-auto">
+                Get in touch with our support team. We're here to help with any questions, 
+                issues, or feedback you might have about ArcadeZone.
+            </p>
+        </div>
+    </section>
+    
+    <!-- Contact Information Cards -->
+    <section class="pb-16 px-4">
+        <div class="max-w-7xl mx-auto">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
+                <div class="info-card">
+                    <div class="text-4xl mb-4">📧</div>
+                    <h3 class="text-xl font-bold orbitron mb-2">Email Support</h3>
+                    <p class="text-gray-300 mb-4">Get help via email</p>
+                    <p class="text-orange font-bold">support@arcadezone.com</p>
+                    <p class="text-sm text-gray-400 mt-2">Response within 24 hours</p>
+                </div>
+                
+                <div class="info-card">
+                    <div class="text-4xl mb-4">💬</div>
+                    <h3 class="text-xl font-bold orbitron mb-2">Live Chat</h3>
+                    <p class="text-gray-300 mb-4">Instant support chat</p>
+                    <p class="text-orange font-bold">Available 24/7</p>
+                    <p class="text-sm text-gray-400 mt-2">Average response: 2 minutes</p>
+                </div>
+                
+                <div class="info-card">
+                    <div class="text-4xl mb-4">📞</div>
+                    <h3 class="text-xl font-bold orbitron mb-2">Phone Support</h3>
+                    <p class="text-gray-300 mb-4">Call our support team</p>
+                    <p class="text-orange font-bold">1-800-ARCADEZ</p>
+                    <p class="text-sm text-gray-400 mt-2">Mon-Fri 9AM-6PM EST</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Contact Form Section -->
+    <section class="pb-16 px-4">
+        <div class="max-w-4xl mx-auto">
+            <div class="contact-card rounded-lg p-8">
+                <h2 class="text-3xl font-bold orbitron text-center mb-8 neon-glow">Send us a Message</h2>
+                
+                <form id="contact-form" class="space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-semibold mb-2">First Name *</label>
+                            <input type="text" name="firstName" class="form-input w-full px-4 py-3 rounded-lg" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold mb-2">Last Name *</label>
+                            <input type="text" name="lastName" class="form-input w-full px-4 py-3 rounded-lg" required>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-semibold mb-2">Email Address *</label>
+                        <input type="email" name="email" class="form-input w-full px-4 py-3 rounded-lg" required>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-semibold mb-2">Subject *</label>
+                        <select name="subject" class="form-input w-full px-4 py-3 rounded-lg" required>
+                            <option value="">Select a topic</option>
+                            <option value="technical">Technical Support</option>
+                            <option value="billing">Billing & Payments</option>
+                            <option value="game-issue">Game Issue</option>
+                            <option value="account">Account Management</option>
+                            <option value="suggestion">Suggestion</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-semibold mb-2">Game (Optional)</label>
+                        <select name="game" class="form-input w-full px-4 py-3 rounded-lg">
+                            <option value="">Select a game</option>
+                            <option value="space-defender">Space Defender</option>
+                            <option value="pixel-quest">Pixel Quest</option>
+                            <option value="retro-blaster">Retro Blaster</option>
+                            <option value="adventure-land">Adventure Land</option>
+                            <option value="system-hack">System Hack</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-semibold mb-2">Message *</label>
+                        <textarea name="message" class="form-textarea w-full px-4 py-3 rounded-lg" placeholder="Please describe your issue or question in detail..." required></textarea>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-semibold mb-2">Attachment (Optional)</label>
+                        <div class="border-2 border-dashed border-gray-600 rounded-lg p-6 text-center">
+                            <input type="file" name="attachment" class="hidden" id="file-input" accept="image/*">
+                            <label for="file-input" class="cursor-pointer">
+                                <div class="text-4xl mb-2">📎</div>
+                                <p class="text-gray-400">Click to upload screenshot or file</p>
+                                <p class="text-sm text-gray-500 mt-1">Max file size: 5MB</p>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="text-center">
+                        <button type="submit" class="btn-primary px-12 py-4 rounded-lg text-xl font-bold">
+                            SEND MESSAGE
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+    
+    <!-- FAQ Section -->
+    <section class="pb-16 px-4">
+        <div class="max-w-4xl mx-auto">
+            <h2 class="text-4xl font-bold orbitron text-center mb-12 neon-glow">Frequently Asked Questions</h2>
+            
+            <div class="space-y-4">
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <h3 class="text-lg font-semibold flex-1">How do I create an account?</h3>
+                        <svg class="faq-icon w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                        </svg>
+                    </div>
+                    <div class="faq-answer">
+                        <p class="text-gray-300">Creating an account is easy! Just click the "Sign Up" button in the top right corner, fill in your details, and you'll be ready to start gaming in minutes.</p>
+                    </div>
+                </div>
+                
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <h3 class="text-lg font-semibold flex-1">What payment methods do you accept?</h3>
+                        <svg class="faq-icon w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                        </svg>
+                    </div>
+                    <div class="faq-answer">
+                        <p class="text-gray-300">We accept all major credit cards, PayPal, and various cryptocurrencies including Bitcoin and Ethereum. All payments are processed securely.</p>
+                    </div>
+                </div>
+                
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <h3 class="text-lg font-semibold flex-1">Can I get a refund for a game?</h3>
+                        <svg class="faq-icon w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                        </svg>
+                    </div>
+                    <div class="faq-answer">
+                        <p class="text-gray-300">Yes! We offer a 14-day refund policy for games that have been played for less than 2 hours. Contact our support team to initiate a refund.</p>
+                    </div>
+                </div>
+                
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <h3 class="text-lg font-semibold flex-1">Are the games compatible with my device?</h3>
+                        <svg class="faq-icon w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                        </svg>
+                    </div>
+                    <div class="faq-answer">
+                        <p class="text-gray-300">Most of our games are web-based and work on any modern browser. Some games may have specific system requirements listed on their individual pages.</p>
+                    </div>
+                </div>
+                
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <h3 class="text-lg font-semibold flex-1">How often do you add new games?</h3>
+                        <svg class="faq-icon w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                        </svg>
+                    </div>
+                    <div class="faq-answer">
+                        <p class="text-gray-300">We add new games every week! Follow us on social media or subscribe to our newsletter to stay updated on the latest releases.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Live Chat Button -->
+    <div class="live-chat" id="live-chat-btn">
+        💬 Live Chat
+    </div>
+    
+    <!-- Footer -->
+    <footer class="bg-black bg-opacity-80 border-t border-orange py-12 px-4">
+        <div class="max-w-7xl mx-auto text-center">
+            <div class="mb-8">
+                <h3 class="text-2xl font-bold orbitron neon-glow mb-4">ArcadeZone</h3>
+                <p class="text-gray-400 max-w-2xl mx-auto">
+                    Your ultimate destination for arcade gaming. Experience the thrill of classic and modern games 
+                    in one comprehensive platform.
+                </p>
+            </div>
+            
+            <div class="flex justify-center space-x-8 mb-8">
+                <a href="index.html" class="nav-link font-semibold">Home</a>
+                <a href="games.html" class="nav-link font-semibold">Games</a>
+                <a href="purchase.html" class="nav-link font-semibold">Purchase</a>
+                <a href="contact.html" class="nav-link font-semibold text-orange">Contact Us</a>
+            </div>
+            
+            <div class="border-t border-gray-700 pt-8">
+                <p class="text-gray-400">
+                    © 2024 ArcadeZone. All rights reserved. Built with passion for gaming.
+                </p>
+            </div>
+        </div>
+    </footer>
+    
+    <script src="main.js"></script>
+    <script>
+        // Contact page specific functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            initContactForm();
+            initFAQ();
+            initLiveChat();
+        });
+        
+        function initContactForm() {
+            const contactForm = document.getElementById('contact-form');
+            const fileInput = document.getElementById('file-input');
+            
+            contactForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const submitBtn = contactForm.querySelector('button[type="submit"]');
+                const originalText = submitBtn.textContent;
+                
+                // Animate button
+                submitBtn.textContent = 'SENDING...';
+                submitBtn.disabled = true;
+                
+                // Simulate form submission
+                setTimeout(() => {
+                    showNotification('Message sent successfully! We\'ll get back to you soon.', 'success');
+                    contactForm.reset();
+                    submitBtn.textContent = originalText;
+                    submitBtn.disabled = false;
+                    
+                    // Animate form
+                    anime({
+                        targets: contactForm,
+                        scale: [1, 1.02, 1],
+                        duration: 500,
+                        easing: 'easeOutElastic(1, .8)'
+                    });
+                }, 2000);
+            });
+            
+            // File input handling
+            fileInput.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const label = document.querySelector('label[for="file-input"]');
+                    label.innerHTML = `
+                        <div class="text-4xl mb-2">✅</div>
+                        <p class="text-orange font-bold">${file.name}</p>
+                        <p class="text-sm text-gray-400 mt-1">Click to change file</p>
+                    `;
+                }
+            });
+        }
+        
+        function initFAQ() {
+            const faqItems = document.querySelectorAll('.faq-item');
+            
+            faqItems.forEach(item => {
+                const question = item.querySelector('.faq-question');
+                
+                question.addEventListener('click', function() {
+                    const isActive = item.classList.contains('active');
+                    
+                    // Close all FAQ items
+                    faqItems.forEach(faq => faq.classList.remove('active'));
+                    
+                    // Open clicked item if it wasn't active
+                    if (!isActive) {
+                        item.classList.add('active');
+                    }
+                });
+            });
+        }
+        
+        function initLiveChat() {
+            const liveChatBtn = document.getElementById('live-chat-btn');
+            
+            liveChatBtn.addEventListener('click', function() {
+                // Simulate live chat opening
+                this.textContent = 'Connecting...';
+                this.disabled = true;
+                
+                setTimeout(() => {
+                    showNotification('Live chat feature coming soon! Please use the contact form for now.', 'info');
+                    this.textContent = '💬 Live Chat';
+                    this.disabled = false;
+                }, 1500);
+            });
+        }
+    </script>
+</body>
+</html>
