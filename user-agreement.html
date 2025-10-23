@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Agreement - ArcadeZone</title>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&family=Press+Start+2P&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <style>
+        :root {
+            --dark-green: #1a4d2e;
+            --light-green: #4a7c59;
+            --orange: #ff6b35;
+            --dark-orange: #e55a2b;
+            --black: #0a0a0a;
+            --gray: #2d2d2d;
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--dark-green) 0%, var(--black) 100%);
+            font-family: 'Rajdhani', sans-serif;
+            color: white;
+            line-height: 1.6;
+        }
+        
+        .orbitron { font-family: 'Orbitron', monospace; }
+        .press-start { font-family: 'Press Start 2P', cursive; }
+        
+        .neon-glow {
+            text-shadow: 0 0 10px var(--orange), 0 0 20px var(--orange), 0 0 30px var(--orange);
+        }
+        
+        .nav-link {
+            position: relative;
+            color: white;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        
+        .nav-link:hover {
+            color: var(--orange);
+        }
+        
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--orange);
+            transition: width 0.3s ease;
+        }
+        
+        .nav-link:hover::after {
+            width: 100%;
+        }
+        
+        .content-section {
+            background: rgba(45, 45, 45, 0.8);
+            border: 1px solid var(--gray);
+            border-radius: 10px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+        
+        .content-section h2 {
+            color: var(--orange);
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 16px;
+        }
+        
+        .content-section h3 {
+            color: var(--orange);
+            font-size: 1.25rem;
+            font-weight: bold;
+            margin-bottom: 12px;
+            margin-top: 20px;
+        }
+        
+        .content-section p {
+            margin-bottom: 16px;
+            color: #e5e5e5;
+        }
+        
+        .content-section ul {
+            margin-bottom: 16px;
+            padding-left: 20px;
+        }
+        
+        .content-section li {
+            margin-bottom: 8px;
+            color: #e5e5e5;
+        }
+        
+        .accept-btn {
+            background: linear-gradient(45deg, var(--orange), var(--dark-orange));
+            border: none;
+            color: var(--black);
+            font-weight: bold;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .accept-btn:hover {
+            background: linear-gradient(45deg, var(--dark-orange), var(--orange));
+            transform: scale(1.05);
+        }
+        
+        .decline-btn {
+            background: var(--gray);
+            border: 2px solid var(--orange);
+            color: white;
+            font-weight: bold;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .decline-btn:hover {
+            background: var(--orange);
+            color: var(--black);
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="bg-black bg-opacity-80 backdrop-blur-sm fixed w-full top-0 z-50 border-b border-orange">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <a href="index.html">
+                        <h1 class="text-2xl font-bold orbitron neon-glow">ArcadeZone</h1>
+                    </a>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-8">
+                        <a href="index.html" class="nav-link font-semibold">Home</a>
+                        <a href="games.html" class="nav-link font-semibold">Games</a>
+                        <a href="purchase.html" class="nav-link font-semibold">Purchase</a>
+                        <a href="contact.html" class="nav-link font-semibold">Contact Us</a>
+                    </div>
+                </div>
+                <div id="auth-nav-container">
+                    <!-- Auth buttons will be inserted here -->
+                </div>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Header Section -->
+    <section class="pt-24 pb-12 px-4">
+        <div class="max-w-4xl mx-auto text-center">
+            <h1 class="text-5xl font-bold orbitron neon-glow mb-4">User Agreement</h1>
+            <p class="text-xl text-gray-300">
+                Please read these terms carefully before using ArcadeZone
+            </p>
+        </div>
+    </section>
+    
+    <!-- Agreement Content -->
+    <section class="pb-16 px-4">
+        <div class="max-w-4xl mx-auto">
+            <div class="content-section">
+                <h2>1. Acceptance of Terms</h2>
+                <p>By accessing and using ArcadeZone ("the Service"), you agree to be bound by these Terms of Service ("Terms"). If you do not agree to these Terms, you may not use the Service.</p>
+                <p>ArcadeZone reserves the right to modify these Terms at any time. Your continued use of the Service after any modifications indicates your acceptance of the updated Terms.</p>
+            </div>
+            
+            <div class="content-section">
+                <h2>2. Description of Service</h2>
+                <p>ArcadeZone provides an online gaming platform that allows users to play various arcade games, purchase premium content, and interact with other users. The Service includes:</p>
+                <ul>
+                    <li>Access to free and premium arcade games</li>
+                    <li>User account management</li>
+                    <li>Game purchase and download services</li>
+                    <li>Community features and leaderboards</li>
+                    <li>Customer support services</li>
+                </ul>
+            </div>
+            
+            <div class="content-section">
+                <h2>3. User Accounts</h2>
+                <h3>3.1 Registration</h3>
+                <p>To access certain features of the Service, you must create an account. You agree to:</p>
+                <ul>
+                    <li>Provide accurate and complete registration information</li>
+                    <li>Maintain and update your information as needed</li>
+                    <li>Maintain the security of your account credentials</li>
+                    <li>Immediately notify us of any unauthorized use of your account</li>
+                </ul>
+                
+                <h3>3.2 Account Security</h3>
+                <p>You are responsible for all activities that occur under your account. You agree to:</p>
+                <ul>
+                    <li>Keep your password confidential</li>
+                    <li>Log out of your account at the end of each session</li>
+                    <li>Not share your account with others</li>
+                    <li>Notify us immediately of any security breach</li>
+                </ul>
+            </div>
+            
+            <div class="content-section">
+                <h2>4. User Conduct</h2>
+                <p>You agree not to use the Service for any unlawful or prohibited activities, including but not limited to:</p>
+                <ul>
+                    <li>Violating any applicable laws or regulations</li>
+                    <li>Infringing on the intellectual property rights of others</li>
+                    <li>Engaging in harassment, abuse, or threatening behavior</li>
+                    <li>Uploading or transmitting viruses or malicious code</li>
+                    <li>Attempting to gain unauthorized access to the Service</li>
+                    <li>Interfering with the proper working of the Service</li>
+                    <li>Using automated systems to access the Service</li>
+                </ul>
+            </div>
+            
+            <div class="content-section">
+                <h2>5. Intellectual Property</h2>
+                <h3>5.1 Ownership</h3>
+                <p>All content, features, and functionality of the Service, including games, graphics, text, and software, are owned by ArcadeZone or its licensors and are protected by international copyright, trademark, and other intellectual property laws.</p>
+                
+                <h3>5.2 User Content</h3>
+                <p>By submitting any content to the Service, you grant ArcadeZone a worldwide, non-exclusive, royalty-free license to use, reproduce, modify, and distribute such content for the purpose of operating and improving the Service.</p>
+            </div>
+            
+            <div class="content-section">
+                <h2>6. Purchases and Payments</h2>
+                <h3>6.1 Pricing</h3>
+                <p>All prices are listed in USD and are subject to change without notice. We reserve the right to modify pricing at any time.</p>
+                
+                <h3>6.2 Refunds</h3>
+                <p>We offer a 14-day refund policy for games that have been played for less than 2 hours. Refund requests should be submitted through our customer support.</p>
+                
+                <h3>6.3 Payment Security</h3>
+                <p>All payment transactions are processed through secure third-party payment processors. We do not store your payment information on our servers.</p>
+            </div>
+            
+            <div class="content-section">
+                <h2>7. Disclaimer of Warranties</h2>
+                <p>The Service is provided "as is" and "as available" without any warranties of any kind, either express or implied. ArcadeZone does not warrant that:</p>
+                <ul>
+                    <li>The Service will be uninterrupted or error-free</li>
+                    <li>The Service will meet your requirements</li>
+                    <li>The results obtained from using the Service will be accurate or reliable</li>
+                    <li>The quality of any products, services, or information will meet your expectations</li>
+                </ul>
+            </div>
+            
+            <div class="content-section">
+                <h2>8. Limitation of Liability</h2>
+                <p>To the maximum extent permitted by law, ArcadeZone shall not be liable for any indirect, incidental, special, consequential, or punitive damages, including but not limited to:</p>
+                <ul>
+                    <li>Loss of profits, data, or goodwill</li>
+                    <li>Business interruption</li>
+                    <li>Personal injury or property damage</li>
+                    <li>Any other damages arising from the use or inability to use the Service</li>
+                </ul>
+            </div>
+            
+            <div class="content-section">
+                <h2>9. Termination</h2>
+                <p>We may terminate or suspend your account and access to the Service immediately, without prior notice or liability, for any reason, including but not limited to:</p>
+                <ul>
+                    <li>Breach of these Terms</li>
+                    <li>Violation of applicable laws</li>
+                    <li>Harmful conduct toward other users</li>
+                    <li>Extended period of inactivity</li>
+                </ul>
+                <p>Upon termination, your right to use the Service will immediately cease. All provisions of these Terms that by their nature should survive termination shall survive.</p>
+            </div>
+            
+            <div class="content-section">
+                <h2>10. Changes to the Service</h2>
+                <p>We reserve the right to modify, suspend, or discontinue the Service at any time without notice. We are not liable for any modification, suspension, or discontinuation of the Service.</p>
+            </div>
+            
+            <div class="content-section">
+                <h2>11. Governing Law</h2>
+                <p>These Terms shall be governed by and construed in accordance with the laws of the United States, without regard to its conflict of law provisions. Any disputes arising under these Terms shall be subject to the exclusive jurisdiction of the courts located in the United States.</p>
+            </div>
+            
+            <div class="content-section">
+                <h2>12. Contact Information</h2>
+                <p>If you have any questions about these Terms, please contact us at:</p>
+                <ul>
+                    <li>Email: legal@arcadezone.com</li>
+                    <li>Address: 123 Gaming Street, Arcade City, AC 12345</li>
+                    <li>Phone: 1-800-ARCADEZ</li>
+                </ul>
+            </div>
+            
+            <!-- Acceptance Buttons -->
+            <div class="text-center mt-12" id="agreement-buttons">
+                <p class="text-lg mb-6">By clicking "I Agree", you acknowledge that you have read and agree to these terms.</p>
+                <div class="space-x-4">
+                    <button class="decline-btn" onclick="declineAgreement()">I Decline</button>
+                    <button class="accept-btn" onclick="acceptAgreement()">I Agree</button>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Footer -->
+    <footer class="bg-black bg-opacity-80 border-t border-orange py-12 px-4">
+        <div class="max-w-7xl mx-auto text-center">
+            <div class="mb-8">
+                <h3 class="text-2xl font-bold orbitron neon-glow mb-4">ArcadeZone</h3>
+                <p class="text-gray-400 max-w-2xl mx-auto">
+                    Your ultimate destination for arcade gaming. Experience the thrill of classic and modern games 
+                    in one comprehensive platform.
+                </p>
+            </div>
+            
+            <div class="flex justify-center space-x-8 mb-8">
+                <a href="index.html" class="nav-link font-semibold">Home</a>
+                <a href="games.html" class="nav-link font-semibold">Games</a>
+                <a href="purchase.html" class="nav-link font-semibold">Purchase</a>
+                <a href="contact.html" class="nav-link font-semibold">Contact Us</a>
+            </div>
+            
+            <div class="border-t border-gray-700 pt-8">
+                <p class="text-gray-400">
+                    © 2024 ArcadeZone. All rights reserved. Built with passion for gaming.
+                </p>
+            </div>
+        </div>
+    </footer>
+    
+    <script src="main.js"></script>
+    <script src="auth.js"></script>
+    <script>
+        function acceptAgreement() {
+            localStorage.setItem('arcadezone-agreement', 'accepted');
+            showNotification('User Agreement accepted! You can now create an account.', 'success');
+            setTimeout(() => {
+                window.location.href = 'index.html';
+            }, 2000);
+        }
+        
+        function declineAgreement() {
+            showNotification('You must accept the User Agreement to use ArcadeZone.', 'error');
+            setTimeout(() => {
+                window.location.href = 'about:blank';
+            }, 2000);
+        }
+    </script>
+</body>
+</html>

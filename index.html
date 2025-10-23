@@ -171,6 +171,66 @@
                 font-size: 1.5rem;
             }
         }
+        
+        /* Authentication Styles */
+        .btn-primary {
+            background: linear-gradient(45deg, var(--orange), var(--dark-orange));
+            border: none;
+            color: var(--black);
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(45deg, var(--dark-orange), var(--orange));
+            transform: scale(1.05);
+        }
+        
+        .form-input {
+            background: var(--gray);
+            border: 2px solid var(--gray);
+            color: white;
+            transition: all 0.3s ease;
+        }
+        
+        .form-input:focus {
+            border-color: var(--orange);
+            outline: none;
+            box-shadow: 0 0 10px rgba(255, 107, 53, 0.3);
+        }
+        
+        .form-textarea {
+            background: var(--gray);
+            border: 2px solid var(--gray);
+            color: white;
+            transition: all 0.3s ease;
+            resize: vertical;
+            min-height: 120px;
+        }
+        
+        .form-textarea:focus {
+            border-color: var(--orange);
+            outline: none;
+            box-shadow: 0 0 10px rgba(255, 107, 53, 0.3);
+        }
+        
+        .password-toggle {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.2rem;
+        }
+        
+        .modal {
+            backdrop-filter: blur(10px);
+        }
+        
+        .modal-content {
+            max-height: 90vh;
+            overflow-y: auto;
+        }
     </style>
 </head>
 <body>
@@ -191,6 +251,9 @@
                         <a href="purchase.html" class="nav-link font-semibold">Purchase</a>
                         <a href="contact.html" class="nav-link font-semibold">Contact Us</a>
                     </div>
+                </div>
+                <div id="auth-nav-container">
+                    <!-- Auth buttons will be inserted here -->
                 </div>
                 <div class="md:hidden">
                     <button id="mobile-menu-btn" class="text-white hover:text-orange">
@@ -279,13 +342,13 @@
             <h2 class="text-4xl font-bold orbitron text-center mb-12 neon-glow">Featured Games</h2>
             
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-                <!-- Game Block 1 - Chess -->
+                <!-- Game Block 1 -->
                 <div class="game-block rounded-lg overflow-hidden">
-                    <img src="resources/game1.jpg" alt="Chess Game" class="w-full h-48 object-cover">
+                    <img src="resources/game1.jpg" alt="Space Shooter" class="w-full h-48 object-cover">
                     <div class="p-4">
-                        <h3 class="text-xl font-bold mb-2 orbitron">Chess Master</h3>
-                        <p class="text-gray-300 text-sm mb-4">Challenge our AI in classic chess. Full rules with promotion and checkmate.</p>
-                        <a href="games/chess.html" class="play-button w-full py-2 rounded-lg font-bold block text-center">PLAY</a>
+                        <h3 class="text-xl font-bold mb-2 orbitron">Space Defender</h3>
+                        <p class="text-gray-300 text-sm mb-4">Epic space battles await in this thrilling shooter experience.</p>
+                        <button class="play-button w-full py-2 rounded-lg font-bold">PLAY</button>
                     </div>
                 </div>
                 
@@ -452,6 +515,140 @@
         </div>
     </footer>
     
+    <!-- Authentication Modals -->
+    <div id="signup-modal" class="modal fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 hidden">
+        <div class="modal-content bg-gray-900 border border-orange rounded-lg p-8 max-w-md w-full mx-4">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold orbitron text-orange">Create Account</h2>
+                <button class="modal-close text-gray-400 hover:text-white">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            
+            <form id="signup-form" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-semibold mb-2">Username</label>
+                    <input type="text" name="username" class="form-input w-full px-4 py-3 rounded-lg" placeholder="Choose a username" required>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-semibold mb-2">Email</label>
+                    <input type="email" name="email" class="form-input w-full px-4 py-3 rounded-lg" placeholder="Enter your email" required>
+                </div>
+                
+                <div class="relative">
+                    <label class="block text-sm font-semibold mb-2">Password</label>
+                    <input type="password" name="password" class="form-input w-full px-4 py-3 rounded-lg pr-12" placeholder="Create a password" required>
+                    <button type="button" class="password-toggle absolute right-3 top-9 text-gray-400 hover:text-white">👁️‍🗨️</button>
+                </div>
+                
+                <div class="relative">
+                    <label class="block text-sm font-semibold mb-2">Confirm Password</label>
+                    <input type="password" name="confirmPassword" class="form-input w-full px-4 py-3 rounded-lg pr-12" placeholder="Confirm your password" required>
+                    <button type="button" class="password-toggle absolute right-3 top-9 text-gray-400 hover:text-white">👁️‍🗨️</button>
+                </div>
+                
+                <div class="flex items-start space-x-3">
+                    <input type="checkbox" name="agree" class="mt-1" required>
+                    <label class="text-sm text-gray-300">
+                        I agree to the 
+                        <a href="user-agreement.html" target="_blank" class="text-orange hover:underline">User Agreement</a>
+                        and 
+                        <a href="privacy-policy.html" target="_blank" class="text-orange hover:underline">Privacy Policy</a>
+                    </label>
+                </div>
+                
+                <button type="submit" class="btn-primary w-full py-3 rounded-lg font-bold text-lg">
+                    Create Account
+                </button>
+            </form>
+            
+            <p class="text-center mt-4 text-gray-400">
+                Already have an account? 
+                <button id="switch-to-login" class="text-orange hover:underline font-semibold">Login</button>
+            </p>
+        </div>
+    </div>
+    
+    <div id="login-modal" class="modal fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 hidden">
+        <div class="modal-content bg-gray-900 border border-orange rounded-lg p-8 max-w-md w-full mx-4">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold orbitron text-orange">Welcome Back</h2>
+                <button class="modal-close text-gray-400 hover:text-white">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            
+            <form id="login-form" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-semibold mb-2">Email or Username</label>
+                    <input type="text" name="identifier" class="form-input w-full px-4 py-3 rounded-lg" placeholder="Enter your email or username" required>
+                </div>
+                
+                <div class="relative">
+                    <label class="block text-sm font-semibold mb-2">Password</label>
+                    <input type="password" name="password" class="form-input w-full px-4 py-3 rounded-lg pr-12" placeholder="Enter your password" required>
+                    <button type="button" class="password-toggle absolute right-3 top-9 text-gray-400 hover:text-white">👁️‍🗨️</button>
+                </div>
+                
+                <div class="flex items-center justify-between">
+                    <label class="flex items-center">
+                        <input type="checkbox" name="rememberMe" class="mr-2">
+                        <span class="text-sm text-gray-300">Remember me</span>
+                    </label>
+                    <button id="forgot-password" type="button" class="text-sm text-orange hover:underline">Forgot password?</button>
+                </div>
+                
+                <button type="submit" class="btn-primary w-full py-3 rounded-lg font-bold text-lg">
+                    Login
+                </button>
+            </form>
+            
+            <p class="text-center mt-4 text-gray-400">
+                Don't have an account? 
+                <button id="switch-to-signup" class="text-orange hover:underline font-semibold">Sign Up</button>
+            </p>
+        </div>
+    </div>
+    
+    <div id="reset-modal" class="modal fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 hidden">
+        <div class="modal-content bg-gray-900 border border-orange rounded-lg p-8 max-w-md w-full mx-4">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold orbitron text-orange">Reset Password</h2>
+                <button class="modal-close text-gray-400 hover:text-white">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            
+            <form id="reset-form" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-semibold mb-2">Email Address</label>
+                    <input type="email" name="email" class="form-input w-full px-4 py-3 rounded-lg" placeholder="Enter your registered email" required>
+                </div>
+                
+                <p class="text-sm text-gray-400">
+                    We'll send you a link to reset your password. Make sure to check your spam folder if you don't see it in your inbox.
+                </p>
+                
+                <button type="submit" class="btn-primary w-full py-3 rounded-lg font-bold text-lg">
+                    Send Reset Link
+                </button>
+            </form>
+            
+            <p class="text-center mt-4 text-gray-400">
+                Remember your password? 
+                <button id="back-to-login" class="text-orange hover:underline font-semibold">Back to Login</button>
+            </p>
+        </div>
+    </div>
+    
     <script src="main.js"></script>
+    <script src="auth.js"></script>
 </body>
 </html>

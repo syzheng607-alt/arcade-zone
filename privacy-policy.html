@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privacy Policy - ArcadeZone</title>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&family=Press+Start+2P&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <style>
+        :root {
+            --dark-green: #1a4d2e;
+            --light-green: #4a7c59;
+            --orange: #ff6b35;
+            --dark-orange: #e55a2b;
+            --black: #0a0a0a;
+            --gray: #2d2d2d;
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--dark-green) 0%, var(--black) 100%);
+            font-family: 'Rajdhani', sans-serif;
+            color: white;
+            line-height: 1.6;
+        }
+        
+        .orbitron { font-family: 'Orbitron', monospace; }
+        .press-start { font-family: 'Press Start 2P', cursive; }
+        
+        .neon-glow {
+            text-shadow: 0 0 10px var(--orange), 0 0 20px var(--orange), 0 0 30px var(--orange);
+        }
+        
+        .nav-link {
+            position: relative;
+            color: white;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        
+        .nav-link:hover {
+            color: var(--orange);
+        }
+        
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--orange);
+            transition: width 0.3s ease;
+        }
+        
+        .nav-link:hover::after {
+            width: 100%;
+        }
+        
+        .content-section {
+            background: rgba(45, 45, 45, 0.8);
+            border: 1px solid var(--gray);
+            border-radius: 10px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+        
+        .content-section h2 {
+            color: var(--orange);
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 16px;
+        }
+        
+        .content-section h3 {
+            color: var(--orange);
+            font-size: 1.25rem;
+            font-weight: bold;
+            margin-bottom: 12px;
+            margin-top: 20px;
+        }
+        
+        .content-section p {
+            margin-bottom: 16px;
+            color: #e5e5e5;
+        }
+        
+        .content-section ul {
+            margin-bottom: 16px;
+            padding-left: 20px;
+        }
+        
+        .content-section li {
+            margin-bottom: 8px;
+            color: #e5e5e5;
+        }
+        
+        .data-table {
+            background: var(--gray);
+            border-radius: 8px;
+            overflow: hidden;
+            margin: 16px 0;
+        }
+        
+        .data-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .data-table th,
+        .data-table td {
+            padding: 12px 16px;
+            text-align: left;
+            border-bottom: 1px solid var(--dark-green);
+        }
+        
+        .data-table th {
+            background: var(--dark-green);
+            color: white;
+            font-weight: bold;
+        }
+        
+        .data-table td {
+            color: #e5e5e5;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="bg-black bg-opacity-80 backdrop-blur-sm fixed w-full top-0 z-50 border-b border-orange">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <a href="index.html">
+                        <h1 class="text-2xl font-bold orbitron neon-glow">ArcadeZone</h1>
+                    </a>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-8">
+                        <a href="index.html" class="nav-link font-semibold">Home</a>
+                        <a href="games.html" class="nav-link font-semibold">Games</a>
+                        <a href="purchase.html" class="nav-link font-semibold">Purchase</a>
+                        <a href="contact.html" class="nav-link font-semibold">Contact Us</a>
+                    </div>
+                </div>
+                <div id="auth-nav-container">
+                    <!-- Auth buttons will be inserted here -->
+                </div>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Header Section -->
+    <section class="pt-24 pb-12 px-4">
+        <div class="max-w-4xl mx-auto text-center">
+            <h1 class="text-5xl font-bold orbitron neon-glow mb-4">Privacy Policy</h1>
+            <p class="text-xl text-gray-300">
+                Last updated: October 20, 2024
+            </p>
+        </div>
+    </section>
+    
+    <!-- Privacy Policy Content -->
+    <section class="pb-16 px-4">
+        <div class="max-w-4xl mx-auto">
+            <div class="content-section">
+                <h2>1. Introduction</h2>
+                <p>ArcadeZone ("we," "our," or "us") is committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our gaming platform and services.</p>
+                <p>By using our Service, you agree to the collection and use of information in accordance with this Privacy Policy. If you do not agree with any part of this policy, please do not use our Service.</p>
+            </div>
+            
+            <div class="content-section">
+                <h2>2. Information We Collect</h2>
+                <h3>2.1 Personal Information</h3>
+                <p>We collect personal information that you provide to us directly, including:</p>
+                <ul>
+                    <li><strong>Account Information:</strong> Username, email address, password</li>
+                    <li><strong>Profile Information:</strong> Avatar, preferences, gaming history</li>
+                    <li><strong>Payment Information:</strong> Billing address, payment method details (processed by third-party providers)</li>
+                    <li><strong>Communication Data:</strong> Messages, feedback, support requests</li>
+                </ul>
+                
+                <h3>2.2 Automatically Collected Information</h3>
+                <p>When you use our Service, we automatically collect certain information:</p>
+                <ul>
+                    <li><strong>Device Information:</strong> IP address, browser type, operating system</li>
+                    <li><strong>Usage Data:</strong> Game play statistics, session duration, features used</li>
+                    <li><strong>Location Data:</strong> General geographic location based on IP address</li>
+                    <li><strong>Cookies and Tracking:</strong> Information stored on your device</li>
+                </ul>
+            </div>
+            
+            <div class="content-section">
+                <h2>3. How We Use Your Information</h2>
+                <p>We use the collected information for various purposes:</p>
+                
+                <div class="data-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Purpose</th>
+                                <th>Legal Basis</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Account creation and management</td>
+                                <td>Contract performance</td>
+                            </tr>
+                            <tr>
+                                <td>Game purchases and transactions</td>
+                                <td>Contract performance</td>
+                            </tr>
+                            <tr>
+                                <td>Customer support and communication</td>
+                                <td>Legitimate interests</td>
+                            </tr>
+                            <tr>
+                                <td>Service improvement and analytics</td>
+                                <td>Legitimate interests</td>
+                            </tr>
+                            <tr>
+                                <td>Marketing and promotions (with consent)</td>
+                                <td>Consent</td>
+                            </tr>
+                            <tr>
+                                <td>Security and fraud prevention</td>
+                                <td>Legal obligations</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div class="content-section">
+                <h2>4. Data Retention</h2>
+                <p>We retain your personal information for as long as necessary to fulfill the purposes outlined in this Privacy Policy, unless a longer retention period is required by law:</p>
+                <ul>
+                    <li><strong>Account Information:</strong> Retained until account deletion</li>
+                    <li><strong>Transaction Records:</strong> Retained for 7 years for tax purposes</li>
+                    <li><strong>Game Purchase History:</strong> Retained for the lifetime of your account</li>
+                    <li><strong>Communication Records:</strong> Retained for 2 years</li>
+                    <li><strong>Analytics Data:</strong> Retained for 26 months</li>
+                </ul>
+            </div>
+            
+            <div class="content-section">
+                <h2>5. Data Sharing and Disclosure</h2>
+                <p>We do not sell your personal information. We may share your information in the following circumstances:</p>
+                
+                <h3>5.1 Service Providers</h3>
+                <p>We may share information with third-party service providers who help us operate our business:</p>
+                <ul>
+                    <li>Payment processors (Stripe, PayPal)</li>
+                    <li>Cloud hosting providers (AWS, Google Cloud)</li>
+                    <li>Analytics services (Google Analytics)</li>
+                    <li>Customer support tools</li>
+                    <li>Email delivery services</li>
+                </ul>
+                
+                <h3>5.2 Legal Requirements</h3>
+                <p>We may disclose information when required by law or to protect our rights:</p>
+                <ul>
+                    <li>Compliance with legal obligations</li>
+                    <li>Protection against legal liability</li>
+                    <li>Investigation of potential violations</li>
+                    <li>Protection of user safety and security</li>
+                </ul>
+            </div>
+            
+            <div class="content-section">
+                <h2>6. Your Rights and Choices</h2>
+                <p>Depending on your location, you may have certain rights regarding your personal information:</p>
+                
+                <h3>6.1 Access and Portability</h3>
+                <ul>
+                    <li>Request a copy of your personal information</li>
+                    <li>Request your data in a portable format</li>
+                </ul>
+                
+                <h3>6.2 Correction and Deletion</h3>
+                <ul>
+                    <li>Correct inaccurate personal information</li>
+                    <li>Request deletion of your personal information</li>
+                    <li>Close your account at any time</li>
+                </ul>
+                
+                <h3>6.3 Marketing Preferences</h3>
+                <ul>
+                    <li>Opt-out of marketing communications</li>
+                    <li>Manage cookie preferences</li>
+                    <li>Control personalized advertising</li>
+                </ul>
+                
+                <p>To exercise these rights, please contact us at privacy@arcadezone.com.</p>
+            </div>
+            
+            <div class="content-section">
+                <h2>7. Data Security</h2>
+                <p>We implement appropriate technical and organizational measures to protect your personal information:</p>
+                <ul>
+                    <li><strong>Encryption:</strong> Data encryption in transit and at rest</li>
+                    <li><strong>Access Controls:</strong> Limited access to personal information</li>
+                    <li><strong>Regular Audits:</strong> Security assessments and monitoring</li>
+                    <li><strong>Employee Training:</strong> Privacy and security training for staff</li>
+                    <li><strong>Incident Response:</strong> Procedures for handling data breaches</li>
+                </ul>
+            </div>
+            
+            <div class="content-section">
+                <h2>8. International Data Transfers</h2>
+                <p>Your information may be transferred to and processed in countries other than your own. We ensure appropriate safeguards are in place for such transfers:</p>
+                <ul>
+                    <li>Standard contractual clauses</li>
+                    <li>Adequacy decisions</li>
+                    <li>Binding corporate rules</li>
+                </ul>
+            </div>
+            
+            <div class="content-section">
+                <h2>9. Children's Privacy</h2>
+                <p>Our Service is not intended for children under 13 years of age. We do not knowingly collect personal information from children under 13. If you believe we have collected information from a child under 13, please contact us immediately.</p>
+                
+                <p>For users between 13 and 18 years of age, parental consent may be required for certain features. We encourage parents and guardians to monitor their children's online activities.</p>
+            </div>
+            
+            <div class="content-section">
+                <h2>10. Cookies and Tracking Technologies</h2>
+                <p>We use cookies and similar tracking technologies to track activity on our Service and hold certain information:</p>
+                
+                <h3>10.1 Types of Cookies</h3>
+                <ul>
+                    <li><strong>Essential Cookies:</strong> Required for basic functionality</li>
+                    <li><strong>Performance Cookies:</strong> Help us understand usage patterns</li>
+                    <li><strong>Functional Cookies:</strong> Remember your preferences</li>
+                    <li><strong>Advertising Cookies:</strong> Deliver relevant advertisements</li>
+                </ul>
+                
+                <h3>10.2 Managing Cookies</h3>
+                <p>You can control cookie settings through your browser preferences. However, disabling certain cookies may affect the functionality of the Service.</p>
+            </div>
+            
+            <div class="content-section">
+                <h2>11. Third-Party Links</h2>
+                <p>Our Service may contain links to third-party websites or services that are not operated by us. We are not responsible for the privacy practices of these third parties. We encourage you to review the privacy policies of any third-party services you visit.</p>
+            </div>
+            
+            <div class="content-section">
+                <h2>12. Changes to This Privacy Policy</h2>
+                <p>We may update our Privacy Policy from time to time. We will notify you of any changes by:</p>
+                <ul>
+                    <li>Posting the new Privacy Policy on this page</li>
+                    <li>Updating the "Last updated" date at the top</li>
+                    <li>Sending email notifications for significant changes</li>
+                </ul>
+                <p>We encourage you to review this Privacy Policy periodically for any changes.</p>
+            </div>
+            
+            <div class="content-section">
+                <h2>13. Contact Us</h2>
+                <p>If you have any questions about this Privacy Policy or our privacy practices, please contact us:</p>
+                <ul>
+                    <li><strong>Email:</strong> privacy@arcadezone.com</li>
+                    <li><strong>Address:</strong> 123 Gaming Street, Arcade City, AC 12345</li>
+                    <li><strong>Phone:</strong> 1-800-ARCADEZ</li>
+                </ul>
+                
+                <h3>13.1 Data Protection Officer</h3>
+                <p>If you are in the European Economic Area, you have the right to lodge a complaint with your local data protection authority about our collection and use of your personal information.</p>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Footer -->
+    <footer class="bg-black bg-opacity-80 border-t border-orange py-12 px-4">
+        <div class="max-w-7xl mx-auto text-center">
+            <div class="mb-8">
+                <h3 class="text-2xl font-bold orbitron neon-glow mb-4">ArcadeZone</h3>
+                <p class="text-gray-400 max-w-2xl mx-auto">
+                    Your ultimate destination for arcade gaming. Experience the thrill of classic and modern games 
+                    in one comprehensive platform.
+                </p>
+            </div>
+            
+            <div class="flex justify-center space-x-8 mb-8">
+                <a href="index.html" class="nav-link font-semibold">Home</a>
+                <a href="games.html" class="nav-link font-semibold">Games</a>
+                <a href="purchase.html" class="nav-link font-semibold">Purchase</a>
+                <a href="contact.html" class="nav-link font-semibold">Contact Us</a>
+            </div>
+            
+            <div class="border-t border-gray-700 pt-8">
+                <p class="text-gray-400">
+                    © 2024 ArcadeZone. All rights reserved. Built with passion for gaming.
+                </p>
+            </div>
+        </div>
+    </footer>
+    
+    <script src="main.js"></script>
+    <script src="auth.js"></script>
+</body>
+</html>
