@@ -212,11 +212,45 @@
 
         // 状态与按钮
         const statusEl = document.getElementById('status');
-        function updateStatus(){ let t='状态: '; if(game.isCheckmate()) t+='将死'; else if(game.isDraw()) t+='和棋'; else if(game.inCheck()) t+='将军'; else t+='游戏中'; statusEl.textContent = t + ` · 轮到: ${game.turn()==='w'?'白':'黑'}`; }
-        document.getElementById('new').onclick = ()=>{ game.reset(); render(); maybeAIMove(true); };
+        let gameEnded = false;
+        
+        function updateStatus() {
+            let t = '状态: ';
+            
+            if (game.isCheckmate()) {
+                t += '将死';
+                const winner = game.turn() === 'w' ? '黑方' : '白方';
+                statusEl.textContent = t + ` · ${winner}获胜！`;
+                
+                // 防止重复弹窗
+                if (!gameEnded) {
+                    gameEnded = true;
+                    setTimeout(() => {
+                        alert(`🎉 游戏结束！\n\n${winner}获胜！\n\n${game.turn() === 'w' ? '白方' : '黑方'}被将死`);
+                    }, 300);
+                }
+            } else if (game.isDraw()) {
+                t += '和棋';
+                statusEl.textContent = t + ' · 平局';
+                
+                if (!gameEnded) {
+                    gameEnded = true;
+                    setTimeout(() => {
+                        alert('🤝 游戏结束！\n\n和棋 - 平局');
+                    }, 300);
+                }
+            } else if (game.inCheck()) {
+                t += '将军';
+                statusEl.textContent = t + ` · 轮到: ${game.turn() === 'w' ? '白' : '黑'}`;
+            } else {
+                t += '游戏中';
+                statusEl.textContent = t + ` · 轮到: ${game.turn() === 'w' ? '白' : '黑'}`;
+            }
+        }
+        document.getElementById('new').onclick = ()=>{ gameEnded = false; game.reset(); render(); maybeAIMove(true); };
         document.getElementById('undo').onclick = ()=>{ game.undo(); game.undo(); render(); };
         document.getElementById('opponent').onchange = ()=>{ render(); maybeAIMove(true); };
-        document.getElementById('side').onchange = ()=>{ game.reset(); render(); maybeAIMove(true); };
+        document.getElementById('side').onchange = ()=>{ gameEnded = false; game.reset(); render(); maybeAIMove(true); };
 
         // Stockfish 集成
         const engine = createStockfishWorker();
