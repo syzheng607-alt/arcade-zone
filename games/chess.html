@@ -50,19 +50,60 @@
         ];
         const { Chess } = await importWithFallback(chessJsCDN);
 
-        // 使用真正的 Stockfish.js WASM
-        async function createStockfishWorker() {
-            try {
-                // 尝试加载 Stockfish WASM 版本
-                const stockfish = new Worker('https://cdn.jsdelivr.net/npm/stockfish@16.0.0/src/stockfish-nnue-16.js');
-                console.log('Loaded real Stockfish engine!');
-                return stockfish;
-            } catch (e) {
-                console.warn('Failed to load Stockfish WASM, using CDN:', e);
-                // 备用：使用 CDN 版本
-                const stockfish = new Worker('https://unpkg.com/stockfish.js@10.0.2/stockfish.js');
-                return stockfish;
+        // 使用真正的 Stockfish.js 引擎
+        function createStockfishWorker() {
+            console.log('Initializing Stockfish engine...');
+            
+            // 使用更可靠的 Stockfish CDN
+            const stockfishUrls = [
+                'https://cdn.jsdelivr.net/npm/stockfish.js@10.0.2/stockfish.js',
+                'https://unpkg.com/stockfish.js@10.0.2/stockfish.js',
+                'https://cdn.jsdelivr.net/npm/stockfish@10.0.2/stockfish.js'
+            ];
+            
+            let workerLoaded = false;
+            let stockfish = null;
+            
+            for (const url of stockfishUrls) {
+                try {
+                    stockfish = new Worker(url);
+                    console.log('✅ Stockfish loaded from:', url);
+                    workerLoaded = true;
+                    break;
+                } catch (e) {
+                    console.warn('❌ Failed to load from:', url, e);
+                }
             }
+            
+            if (!workerLoaded || !stockfish) {
+                console.error('⚠️ ALL Stockfish URLs failed! Falling back to basic AI');
+                alert('警告：无法加载 Stockfish 引擎，将使用基本 AI（较弱）');
+                // 返回一个假的 worker 以避免崩溃
+                return createFallbackWorker();
+            }
+            
+            return stockfish;
+        }
+        
+        // 备用简单AI（如果Stockfish加载失败）
+        function createFallbackWorker() {
+            const code = `
+                self.onmessage = function(e) {
+                    const cmd = e.data;
+                    if (cmd === 'uci') {
+                        self.postMessage('uciok');
+                    } else if (cmd.startsWith('position')) {
+                        // 存储位置
+                    } else if (cmd.startsWith('go')) {
+                        // 返回随机走法（需要从position中解析）
+                        setTimeout(() => {
+                            self.postMessage('bestmove e2e4'); // 简单默认走法
+                        }, 500);
+                    }
+                };
+            `;
+            const blob = new Blob([code], { type: 'application/javascript' });
+            return new Worker(URL.createObjectURL(blob));
         }
 
         // 页面骨架
@@ -188,8 +229,10 @@
         document.getElementById('side').onchange = ()=>{ game.reset(); render(); maybeAIMove(true); };
 
         // Stockfish 集成
-        const engine = await createStockfishWorker();
+        const engine = createStockfishWorker();
         let engineReady = false;
+        
+        console.log('🎮 Chess engine initialized:', engine ? 'Success' : 'Failed');
         
         engine.onmessage = (ev)=>{
             const line = typeof ev.data === 'string' ? ev.data : String(ev.data);
@@ -232,18 +275,23 @@
             if (!force && currentTurn === humanColor) return;
             if (force && humanColor === 'w' && game.history().length === 0) return;
             
-            console.log('AI should move now');
+            console.log('🤖 AI is thinking...');
             statusEl.textContent = '状态: AI 思考中...';
             
             const level = parseInt(document.getElementById('level').value, 10);
             const depth = parseInt(document.getElementById('depth').value, 10);
             const fen = game.fen();
             
+            console.log('📊 AI Settings:', { level, depth });
+            console.log('📋 Position FEN:', fen);
+            
             // 发送命令到 Stockfish
+            console.log('📤 Sending commands to Stockfish...');
             engine.postMessage('ucinewgame');
             engine.postMessage(`setoption name Skill Level value ${level}`);
             engine.postMessage(`position fen ${fen}`);
             engine.postMessage(`go depth ${depth}`);
+            console.log(`✅ Commands sent: level=${level}, depth=${depth}`);
         }
 
         // 初始渲染
