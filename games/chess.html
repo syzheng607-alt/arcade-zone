@@ -36,7 +36,7 @@
         @media (max-width: 1024px) { .container { grid-template-columns: 1fr; justify-items: center; } .side { width: 640px; height: auto; } }
     </style>
     <script type="module">
-        // 动态导入（多CDN回退）
+        // 动态导入 chess.js
         async function importWithFallback(candidates) {
             for (const url of candidates) {
                 try { return await import(url); } catch (e) { console.warn('导入失败', url, e); }
@@ -44,267 +44,40 @@
             throw new Error('所有 CDN 导入均失败');
         }
         const chessJsCDN = [
-            // 本地同源优先（请将 chess.js ESM 文件保存为 ./lib/chess.mjs）
             new URL('../lib/chess.mjs', location.href).href,
-            'https://cdn.staticfile.org/chess.js/1.0.0/chess.min.js',
-            'https://lib.baomitu.com/chess.js/1.0.0/chess.min.js',
-            'https://cdn.bootcdn.net/ajax/libs/chess.js/1.0.0/chess.min.js',
             'https://cdn.jsdelivr.net/npm/chess.js@1.0.0/dist/esm/chess.js',
             'https://esm.sh/chess.js@1.0.0',
-            'https://esm.run/chess.js@1.0.0'
         ];
         const { Chess } = await importWithFallback(chessJsCDN);
 
+        // 使用真正的 Stockfish.js WASM
         async function createStockfishWorker() {
-            // 创建内联 Stockfish Worker，使用简化的走法生成
-            const stockfishCode = `
-                // 简化的走法生成器，不依赖外部库
-                let fen = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
-                let isReady = false;
-                
-                // 简单的走法生成（仅处理基本走法）
-                function generateMoves(fen) {
-                    const moves = [];
-                    const parts = fen.split(' ');
-                    const board = parts[0];
-                    const turn = parts[1];
-                    
-                    // 解析棋盘
-                    const squares = [];
-                    let row = 0, col = 0;
-                    for (let i = 0; i < board.length; i++) {
-                        const char = board[i];
-                        if (char === '/') {
-                            row++; col = 0;
-                        } else if (char >= '1' && char <= '8') {
-                            for (let j = 0; j < parseInt(char); j++) {
-                                squares[row * 8 + col] = null;
-                                col++;
-                            }
-                        } else {
-                            squares[row * 8 + col] = char;
-                            col++;
-                        }
-                    }
-                    
-                    // 生成基本走法
-                    for (let from = 0; from < 64; from++) {
-                        const piece = squares[from];
-                        if (!piece || (turn === 'w' && piece === piece.toLowerCase()) || 
-                            (turn === 'b' && piece === piece.toUpperCase())) continue;
-                            
-                        const fromRow = Math.floor(from / 8);
-                        const fromCol = from % 8;
-                        const fromSquare = String.fromCharCode(97 + fromCol) + (8 - fromRow);
-                        
-                        // 兵的基本走法
-                        if (piece.toLowerCase() === 'p') {
-                            const direction = piece === 'P' ? -1 : 1;
-                            const startRow = piece === 'P' ? 6 : 1;
-                            
-                            // 前进
-                            const toRow = fromRow + direction;
-                            if (toRow >= 0 && toRow < 8) {
-                                const toSquare = String.fromCharCode(97 + fromCol) + (8 - toRow);
-                                if (!squares[toRow * 8 + fromCol]) {
-                                    moves.push(fromSquare + toSquare);
-                                }
-                            }
-                            
-                            // 吃子
-                            for (const dc of [-1, 1]) {
-                                const toCol = fromCol + dc;
-                                const toRow = fromRow + direction;
-                                if (toCol >= 0 && toCol < 8 && toRow >= 0 && toRow < 8) {
-                                    const target = squares[toRow * 8 + toCol];
-                                    if (target && ((piece === 'P' && target === target.toLowerCase()) || 
-                                        (piece === 'p' && target === target.toUpperCase()))) {
-                                        const toSquare = String.fromCharCode(97 + toCol) + (8 - toRow);
-                                        moves.push(fromSquare + toSquare);
-                                    }
-                                }
-                            }
-                        }
-                        
-                        // 其他棋子的走法（更智能的移动）
-                        if (piece.toLowerCase() !== 'p') {
-                            const pieceType = piece.toLowerCase();
-                            
-                            if (pieceType === 'r') {
-                                // 车：直线移动
-                                const directions = [[-1,0],[1,0],[0,-1],[0,1]];
-                                for (const [dr, dc] of directions) {
-                                    for (let i = 1; i < 8; i++) {
-                                        const toRow = fromRow + dr * i;
-                                        const toCol = fromCol + dc * i;
-                                        if (toRow < 0 || toRow >= 8 || toCol < 0 || toCol >= 8) break;
-                                        const target = squares[toRow * 8 + toCol];
-                                        if (target) {
-                                            // 只能吃对方棋子
-                                            if ((piece === piece.toUpperCase() && target === target.toLowerCase()) ||
-                                                (piece === piece.toLowerCase() && target === target.toUpperCase())) {
-                                                const toSquare = String.fromCharCode(97 + toCol) + (8 - toRow);
-                                                moves.push(fromSquare + toSquare);
-                                            }
-                                            break; // 遇到任何棋子都停止
-                                        }
-                                        const toSquare = String.fromCharCode(97 + toCol) + (8 - toRow);
-                                        moves.push(fromSquare + toSquare);
-                                    }
-                                }
-                            } else if (pieceType === 'b') {
-                                // 象：斜线移动
-                                const directions = [[-1,-1],[-1,1],[1,-1],[1,1]];
-                                for (const [dr, dc] of directions) {
-                                    for (let i = 1; i < 8; i++) {
-                                        const toRow = fromRow + dr * i;
-                                        const toCol = fromCol + dc * i;
-                                        if (toRow < 0 || toRow >= 8 || toCol < 0 || toCol >= 8) break;
-                                        const target = squares[toRow * 8 + toCol];
-                                        if (target) {
-                                            // 只能吃对方棋子
-                                            if ((piece === piece.toUpperCase() && target === target.toLowerCase()) ||
-                                                (piece === piece.toLowerCase() && target === target.toUpperCase())) {
-                                                const toSquare = String.fromCharCode(97 + toCol) + (8 - toRow);
-                                                moves.push(fromSquare + toSquare);
-                                            }
-                                            break; // 遇到任何棋子都停止
-                                        }
-                                        const toSquare = String.fromCharCode(97 + toCol) + (8 - toRow);
-                                        moves.push(fromSquare + toSquare);
-                                    }
-                                }
-                            } else if (pieceType === 'q') {
-                                // 后：直线+斜线移动
-                                const directions = [[-1,-1],[-1,0],[-1,1],[0,-1],[0,1],[1,-1],[1,0],[1,1]];
-                                for (const [dr, dc] of directions) {
-                                    for (let i = 1; i < 8; i++) {
-                                        const toRow = fromRow + dr * i;
-                                        const toCol = fromCol + dc * i;
-                                        if (toRow < 0 || toRow >= 8 || toCol < 0 || toCol >= 8) break;
-                                        const target = squares[toRow * 8 + toCol];
-                                        if (target) {
-                                            // 只能吃对方棋子
-                                            if ((piece === piece.toUpperCase() && target === target.toLowerCase()) ||
-                                                (piece === piece.toLowerCase() && target === target.toUpperCase())) {
-                                                const toSquare = String.fromCharCode(97 + toCol) + (8 - toRow);
-                                                moves.push(fromSquare + toSquare);
-                                            }
-                                            break; // 遇到任何棋子都停止
-                                        }
-                                        const toSquare = String.fromCharCode(97 + toCol) + (8 - toRow);
-                                        moves.push(fromSquare + toSquare);
-                                    }
-                                }
-                            } else if (pieceType === 'k') {
-                                // 王：周围8格
-                                const directions = [[-1,-1],[-1,0],[-1,1],[0,-1],[0,1],[1,-1],[1,0],[1,1]];
-                                for (const [dr, dc] of directions) {
-                                    const toRow = fromRow + dr;
-                                    const toCol = fromCol + dc;
-                                    if (toRow >= 0 && toRow < 8 && toCol >= 0 && toCol < 8) {
-                                        const target = squares[toRow * 8 + toCol];
-                                        if (!target || ((piece === piece.toUpperCase() && target === target.toLowerCase()) ||
-                                            (piece === piece.toLowerCase() && target === target.toUpperCase()))) {
-                                            const toSquare = String.fromCharCode(97 + toCol) + (8 - toRow);
-                                            moves.push(fromSquare + toSquare);
-                                        }
-                                    }
-                                }
-                            } else if (pieceType === 'n') {
-                                // 马：L形移动
-                                const knightMoves = [[-2,-1],[-2,1],[-1,-2],[-1,2],[1,-2],[1,2],[2,-1],[2,1]];
-                                for (const [dr, dc] of knightMoves) {
-                                    const toRow = fromRow + dr;
-                                    const toCol = fromCol + dc;
-                                    if (toRow >= 0 && toRow < 8 && toCol >= 0 && toCol < 8) {
-                                        const target = squares[toRow * 8 + toCol];
-                                        if (!target || ((piece === piece.toUpperCase() && target === target.toLowerCase()) ||
-                                            (piece === piece.toLowerCase() && target === target.toUpperCase()))) {
-                                            const toSquare = String.fromCharCode(97 + toCol) + (8 - toRow);
-                                            moves.push(fromSquare + toSquare);
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    
-                    return moves;
-                }
-                
-                self.onmessage = function(e) {
-                    const line = e.data;
-                    console.log('Worker received:', line);
-                    
-                    if (line === 'uci') {
-                        self.postMessage('id name Stockfish 17.1');
-                        self.postMessage('id author Stockfish Team');
-                        self.postMessage('uciok');
-                        isReady = true;
-                    } else if (line === 'isready') {
-                        self.postMessage('readyok');
-                    } else if (line.startsWith('position')) {
-                        const parts = line.split(' ');
-                        if (parts[1] === 'fen') {
-                            fen = parts.slice(2, 8).join(' ');
-                        }
-                    } else if (line.startsWith('go')) {
-                        setTimeout(() => {
-                            try {
-                                const moves = generateMoves(fen);
-                                if (moves.length === 0) {
-                                    self.postMessage('bestmove (none)');
-                                    return;
-                                }
-                                
-                                // 优先选择安全的走法（避免将军、吃子等）
-                                const safeMoves = moves.filter(move => {
-                                    // 简单检查：避免明显的危险走法
-                                    const from = move.substring(0, 2);
-                                    const to = move.substring(2, 4);
-                                    
-                                    // 避免王走到被攻击的格子
-                                    if (fen.includes('k') && from.includes('k')) {
-                                        // 这里可以添加更复杂的检查
-                                        return true;
-                                    }
-                                    
-                                    return true;
-                                });
-                                
-                                const finalMoves = safeMoves.length > 0 ? safeMoves : moves;
-                                const randomMove = finalMoves[Math.floor(Math.random() * finalMoves.length)];
-                                console.log('AI generated moves:', moves.length, 'selected:', randomMove);
-                                self.postMessage('bestmove ' + randomMove);
-                            } catch (err) {
-                                console.error('Move generation error:', err);
-                                self.postMessage('bestmove e7e5');
-                            }
-                        }, 300 + Math.random() * 700);
-                    }
-                };
-            `;
-            
-            const blob = new Blob([stockfishCode], { type: 'application/javascript' });
-            const blobUrl = URL.createObjectURL(blob);
-            console.info('Using inline Stockfish Worker with basic move generation');
-            return new Worker(blobUrl);
+            try {
+                // 尝试加载 Stockfish WASM 版本
+                const stockfish = new Worker('https://cdn.jsdelivr.net/npm/stockfish@16.0.0/src/stockfish-nnue-16.js');
+                console.log('Loaded real Stockfish engine!');
+                return stockfish;
+            } catch (e) {
+                console.warn('Failed to load Stockfish WASM, using CDN:', e);
+                // 备用：使用 CDN 版本
+                const stockfish = new Worker('https://unpkg.com/stockfish.js@10.0.2/stockfish.js');
+                return stockfish;
+            }
         }
 
         // 页面骨架
-        const h1 = document.createElement('h1'); h1.textContent = '国际象棋 - 在线对战（含AI）';
-        const subtitle = document.createElement('div'); subtitle.className = 'subtitle'; subtitle.textContent = '完整规则 · 升变 · 将军/将死 · Stockfish AI';
+        const h1 = document.createElement('h1'); h1.textContent = '国际象棋 - 真正的 Stockfish AI';
+        const subtitle = document.createElement('div'); subtitle.className = 'subtitle'; subtitle.textContent = '完整规则 · 真正的 Stockfish 引擎 · 多难度级别';
         const container = document.createElement('div'); container.className = 'container';
         const board = document.createElement('div'); board.className = 'board';
         const side = document.createElement('div'); side.className = 'side';
         document.body.appendChild(h1); document.body.appendChild(subtitle); document.body.appendChild(container);
         container.appendChild(board); container.appendChild(side);
         side.innerHTML = ''+
-        '<div class="row"><label>对手</label><select id="opponent"><option value="ai" selected>AI</option><option value="human">本地双人</option></select></div>'+
+        '<div class="row"><label>对手</label><select id="opponent"><option value="ai" selected>AI (Stockfish)</option><option value="human">本地双人</option></select></div>'+
         '<div class="row"><label>你执</label><select id="side"><option value="w" selected>白</option><option value="b">黑</option></select></div>'+
-        '<div class="row"><label>难度</label><select id="level"><option value="1">1</option><option value="5" selected>5</option><option value="10">10</option><option value="15">15</option><option value="20">20</option></select></div>'+
-        '<div class="row"><label>深度</label><select id="depth"><option value="8">8</option><option value="10" selected>10</option><option value="12">12</option><option value="14">14</option><option value="18">18</option></select></div>'+
+        '<div class="row"><label>难度</label><select id="level"><option value="1">极易</option><option value="5">简单</option><option value="10" selected>中等</option><option value="15">困难</option><option value="20">专家</option></select></div>'+
+        '<div class="row"><label>深度</label><select id="depth"><option value="5">5</option><option value="10" selected>10</option><option value="15">15</option><option value="20">20</option></select></div>'+
         '<div class="row" style="gap:10px; margin-top:4px;"><button id="new">新局</button><button id="undo">悔棋</button></div>'+
         '<div class="status" id="status">状态: 游戏中</div>'+
         '<div class="history"><h3>走子记录</h3><div class="list" id="moves"></div></div>';
@@ -318,7 +91,6 @@
         document.body.appendChild(promoMask);
 
         // 棋局与渲染
-        // 使用经典国际象棋 SVG 图标（Wikimedia cburnett 套系），跨域图片可直接显示
         function pieceImageUrl(type, color) {
             const key = (color === 'w' ? type.toUpperCase() : type);
             const map = {
@@ -417,100 +189,67 @@
 
         // Stockfish 集成
         const engine = await createStockfishWorker();
-        let uciReady = false;
-        let readyForMove = false;
+        let engineReady = false;
         
         engine.onmessage = (ev)=>{
-            const line = typeof ev === 'string' ? ev : ev.data; if(typeof line !== 'string') return;
-            console.log('Engine message:', line);
-            if (line.indexOf('uciok') !== -1) {
-                uciReady = true;
-                console.log('UCI ready');
+            const line = typeof ev.data === 'string' ? ev.data : String(ev.data);
+            console.log('Stockfish:', line);
+            
+            if (line === 'uciok') {
+                engineReady = true;
+                console.log('Stockfish engine ready!');
             }
-            if (line.indexOf('readyok') !== -1) {
-                readyForMove = true;
-                console.log('Engine ready for move');
-            }
-            if(line.startsWith('bestmove')){ 
-                console.log('Bestmove received:', line);
-                const parts=line.split(' '); const mv=parts[1]; 
-                if(mv && mv.length>=4){ 
-                    const from=mv.slice(0,2), to=mv.slice(2,4), promo=mv[4]; 
-                    console.log('AI move:', from, 'to', to, promo ? 'promote to ' + promo : '');
+            
+            if (line.startsWith('bestmove')) {
+                const parts = line.split(' ');
+                const mv = parts[1];
+                if (mv && mv.length >= 4 && mv !== '(none)') {
+                    const from = mv.slice(0, 2);
+                    const to = mv.slice(2, 4);
+                    const promo = mv[4];
+                    console.log('Stockfish move:', from, 'to', to, promo ? 'promote to ' + promo : '');
                     
-                    // 验证走法是否合法
-                    try {
-                        const testGame = new Chess(game.fen());
-                        const moveObj = {from, to};
-                        if (promo) moveObj.promotion = promo;
-                        const result = testGame.move(moveObj);
-                        
-                        if (result) {
-                            // 走法合法，执行
-                            tryMove(from, to, promo);
-                            statusEl.textContent = '状态: 游戏中 · AI已走';
-                        } else {
-                            // 走法不合法，重新生成
-                            console.warn('Invalid AI move, regenerating...');
-                            engine.postMessage('go depth 1');
-                        }
-                    } catch (err) {
-                        console.error('Move validation error:', err);
-                        // 出错时重新生成
-                        engine.postMessage('go depth 1');
-                    }
+                    setTimeout(() => {
+                        tryMove(from, to, promo);
+                        statusEl.textContent = '状态: AI 已走棋';
+                    }, 100);
                 }
             }
         };
         
-        // 简化初始化
+        // 初始化引擎
         engine.postMessage('uci');
-        setTimeout(() => {
-            if (!uciReady) {
-                console.log('UCI timeout, proceeding anyway');
-                uciReady = true;
-            }
-        }, 2000);
-        async function maybeAIMove(force=false){ 
-            const opponent=document.getElementById('opponent').value; 
-            const humanColor=document.getElementById('side').value; 
+        
+        async function maybeAIMove(force = false) {
+            const opponent = document.getElementById('opponent').value;
+            const humanColor = document.getElementById('side').value;
             const currentTurn = game.turn();
-            const historyLength = game.history().length;
             
-            console.log('maybeAIMove called:', { force, opponent, humanColor, currentTurn, historyLength, isGameOver: game.isGameOver() });
+            console.log('maybeAIMove:', { force, opponent, humanColor, currentTurn, gameOver: game.isGameOver() });
             
-            if(opponent!=='ai') { console.log('Not AI opponent, skipping'); return; }
-            if(game.isGameOver()) { console.log('Game over, skipping'); return; }
-            if(!force && currentTurn===humanColor) { console.log('Human turn, skipping'); return; }
-            
-            // 初始化时仅当人执黑才让AI先走
-            if (force && humanColor === 'w' && historyLength === 0) { 
-                console.log('Human plays white, AI should not move first'); 
-                return; 
-            }
+            if (opponent !== 'ai') return;
+            if (game.isGameOver()) return;
+            if (!force && currentTurn === humanColor) return;
+            if (force && humanColor === 'w' && game.history().length === 0) return;
             
             console.log('AI should move now');
-            const level=parseInt(document.getElementById('level').value,10); 
-            let depth=parseInt(document.getElementById('depth').value,10);
-            if (!Number.isFinite(depth) || depth > 14) depth = 10;
-            const fen=game.fen();
-            console.log('FEN:', fen, 'Level:', level, 'Depth:', depth);
+            statusEl.textContent = '状态: AI 思考中...';
             
-            // 简化命令序列，不等待 readyok
-            engine.postMessage('stop');
+            const level = parseInt(document.getElementById('level').value, 10);
+            const depth = parseInt(document.getElementById('depth').value, 10);
+            const fen = game.fen();
+            
+            // 发送命令到 Stockfish
             engine.postMessage('ucinewgame');
             engine.postMessage(`setoption name Skill Level value ${level}`);
-            engine.postMessage('setoption name UCI_Chess960 value false');
             engine.postMessage(`position fen ${fen}`);
             engine.postMessage(`go depth ${depth}`);
-            console.log('Sent go command, waiting for bestmove...');
-            statusEl.textContent='状态: AI思考中...'; 
         }
 
         // 初始渲染
-        render(); maybeAIMove(true);
+        render();
+        setTimeout(() => maybeAIMove(true), 1000);
     </script>
 </head>
 <body></body>
 </html>
-
