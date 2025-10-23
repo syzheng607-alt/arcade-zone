@@ -44,45 +44,35 @@
             throw new Error('所有 CDN 导入均失败');
         }
         const chessJsCDN = [
-            new URL('../lib/chess.mjs', location.href).href,
             'https://cdn.jsdelivr.net/npm/chess.js@1.0.0/dist/esm/chess.js',
             'https://esm.sh/chess.js@1.0.0',
+            new URL('../lib/chess.mjs', location.href).href,
         ];
         const { Chess } = await importWithFallback(chessJsCDN);
 
-        // 使用真正的 Stockfish.js 引擎
+        // 使用本地 Stockfish.js 引擎
         function createStockfishWorker() {
-            console.log('Initializing Stockfish engine...');
+            console.log('🚀 Initializing Stockfish engine...');
             
-            // 使用更可靠的 Stockfish CDN
-            const stockfishUrls = [
-                'https://cdn.jsdelivr.net/npm/stockfish.js@10.0.2/stockfish.js',
-                'https://unpkg.com/stockfish.js@10.0.2/stockfish.js',
-                'https://cdn.jsdelivr.net/npm/stockfish@10.0.2/stockfish.js'
-            ];
-            
-            let workerLoaded = false;
-            let stockfish = null;
-            
-            for (const url of stockfishUrls) {
-                try {
-                    stockfish = new Worker(url);
-                    console.log('✅ Stockfish loaded from:', url);
-                    workerLoaded = true;
-                    break;
-                } catch (e) {
-                    console.warn('❌ Failed to load from:', url, e);
-                }
-            }
-            
-            if (!workerLoaded || !stockfish) {
-                console.error('⚠️ ALL Stockfish URLs failed! Falling back to basic AI');
-                alert('警告：无法加载 Stockfish 引擎，将使用基本 AI（较弱）');
-                // 返回一个假的 worker 以避免崩溃
+            try {
+                // 使用本地的 Stockfish.js
+                const stockfishPath = new URL('../lib/stockfish.js', location.href).href;
+                console.log('📦 Loading Stockfish from:', stockfishPath);
+                
+                const stockfish = new Worker(stockfishPath);
+                console.log('✅ Stockfish loaded successfully!');
+                
+                // 添加错误处理
+                stockfish.onerror = function(error) {
+                    console.error('❌ Stockfish worker error:', error);
+                };
+                
+                return stockfish;
+            } catch (e) {
+                console.error('⚠️ Failed to load Stockfish:', e);
+                alert('警告：无法加载 Stockfish 引擎，将使用基本 AI（较弱）\n\n错误: ' + e.message);
                 return createFallbackWorker();
             }
-            
-            return stockfish;
         }
         
         // 备用简单AI（如果Stockfish加载失败）
