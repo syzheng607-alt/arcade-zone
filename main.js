@@ -99,6 +99,12 @@ function initGameBlocks() {
     // Play button interactions
     playButtons.forEach(button => {
         button.addEventListener('click', function(e) {
+            // If it's a link with href, let it navigate
+            if (this.tagName === 'A' && this.getAttribute('href')) {
+                // Don't prevent default, let the link work
+                return;
+            }
+            
             e.preventDefault();
             
             // Button animation
