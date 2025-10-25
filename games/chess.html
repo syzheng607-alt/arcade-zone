@@ -392,21 +392,40 @@
         // 棋局与渲染
         function pieceImageUrl(type, color) {
             const key = (color === 'w' ? type.toUpperCase() : type);
+            // 使用多个 CDN 源，确保在各种网络环境下都能加载
+            const cdnBase = [
+                'https://cdn.jsdelivr.net/gh/lichess-org/lila@master/public/piece/cburnett/',
+                'https://images.chesscomfiles.com/chess-themes/pieces/neo/150/',
+                'https://upload.wikimedia.org/wikipedia/commons/'
+            ];
+            
             const map = {
-                P: 'https://upload.wikimedia.org/wikipedia/commons/4/45/Chess_plt45.svg',
-                N: 'https://upload.wikimedia.org/wikipedia/commons/7/70/Chess_nlt45.svg',
-                B: 'https://upload.wikimedia.org/wikipedia/commons/b/b1/Chess_blt45.svg',
-                R: 'https://upload.wikimedia.org/wikipedia/commons/7/72/Chess_rlt45.svg',
-                Q: 'https://upload.wikimedia.org/wikipedia/commons/1/15/Chess_qlt45.svg',
-                K: 'https://upload.wikimedia.org/wikipedia/commons/4/42/Chess_klt45.svg',
-                p: 'https://upload.wikimedia.org/wikipedia/commons/c/c7/Chess_pdt45.svg',
-                n: 'https://upload.wikimedia.org/wikipedia/commons/e/ef/Chess_ndt45.svg',
-                b: 'https://upload.wikimedia.org/wikipedia/commons/9/98/Chess_bdt45.svg',
-                r: 'https://upload.wikimedia.org/wikipedia/commons/f/ff/Chess_rdt45.svg',
-                q: 'https://upload.wikimedia.org/wikipedia/commons/4/47/Chess_qdt45.svg',
-                k: 'https://upload.wikimedia.org/wikipedia/commons/f/f0/Chess_kdt45.svg'
+                // 白棋 - 使用 lichess CDN
+                P: `${cdnBase[0]}wP.svg`,
+                N: `${cdnBase[0]}wN.svg`,
+                B: `${cdnBase[0]}wB.svg`,
+                R: `${cdnBase[0]}wR.svg`,
+                Q: `${cdnBase[0]}wQ.svg`,
+                K: `${cdnBase[0]}wK.svg`,
+                // 黑棋 - 使用 lichess CDN
+                p: `${cdnBase[0]}bP.svg`,
+                n: `${cdnBase[0]}bN.svg`,
+                b: `${cdnBase[0]}bB.svg`,
+                r: `${cdnBase[0]}bR.svg`,
+                q: `${cdnBase[0]}bQ.svg`,
+                k: `${cdnBase[0]}bK.svg`
             };
             return map[key];
+        }
+        
+        // 备用：使用 Unicode 字符（如果图片加载失败）
+        function getPieceUnicode(type, color) {
+            const symbols = {
+                P: '♙', N: '♘', B: '♗', R: '♖', Q: '♕', K: '♔',
+                p: '♟', n: '♞', b: '♝', r: '♜', q: '♛', k: '♚'
+            };
+            const key = (color === 'w' ? type.toUpperCase() : type);
+            return symbols[key];
         }
         const game = new Chess();
         const squares = [];
@@ -436,6 +455,19 @@
                     img.style.width = '86%';
                     img.style.height = '86%';
                     img.style.objectFit = 'contain';
+                    
+                    // 图片加载失败时使用 Unicode 字符作为备用
+                    img.onerror = function() {
+                        console.warn('Failed to load piece image:', img.src);
+                        const fallback = document.createElement('span');
+                        fallback.textContent = getPieceUnicode(p.type, p.color);
+                        fallback.style.fontSize = '48px';
+                        fallback.style.lineHeight = '1';
+                        fallback.style.userSelect = 'none';
+                        fallback.style.filter = p.color === 'w' ? 'drop-shadow(0 1px 2px rgba(0,0,0,0.3))' : 'none';
+                        this.parentElement.replaceChild(fallback, this);
+                    };
+                    
                     squares[r*8+c].appendChild(img);
                 }
             }
