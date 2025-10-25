@@ -14,6 +14,19 @@
       "use": "@vercel/static"
     }
   ],
+  "redirects": [
+    {
+      "source": "/(.*)",
+      "has": [
+        {
+          "type": "host",
+          "value": "rockcavegames.com"
+        }
+      ],
+      "destination": "https://www.rockcavegames.com/$1",
+      "permanent": true
+    }
+  ],
   "routes": [
     {
       "src": "/(.*)",
