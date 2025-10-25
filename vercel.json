@@ -1,19 +1,4 @@
 {
-  "version": 2,
-  "builds": [
-    {
-      "src": "**/*.html",
-      "use": "@vercel/static"
-    },
-    {
-      "src": "**/*.js",
-      "use": "@vercel/static"
-    },
-    {
-      "src": "resources/**",
-      "use": "@vercel/static"
-    }
-  ],
   "redirects": [
     {
       "source": "/(.*)",
@@ -25,12 +10,6 @@
       ],
       "destination": "https://www.rockcavegames.com/$1",
       "permanent": true
-    }
-  ],
-  "routes": [
-    {
-      "src": "/(.*)",
-      "dest": "/$1"
     }
   ]
 }
