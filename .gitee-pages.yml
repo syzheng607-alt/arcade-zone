@@ -1,0 +1,4 @@
+# Gitee Pages 配置
+build:
+  commands:
+    - echo "Static site, no build needed"

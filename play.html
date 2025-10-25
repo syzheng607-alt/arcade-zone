@@ -70,6 +70,29 @@
             display: block;
         }
         
+        /* 手机适配 */
+        @media (max-width: 768px) {
+            .game-container {
+                height: calc(100vh - 64px - 50px); /* 手机上底部更小 */
+                min-height: 500px;
+            }
+            footer {
+                padding: 10px;
+                font-size: 12px;
+            }
+            footer .flex {
+                flex-direction: column;
+                gap: 8px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .game-container {
+                height: calc(100vh - 56px - 40px); /* 更小的导航栏和底部 */
+                min-height: 400px;
+            }
+        }
+        
         .lang-switch {
             cursor: pointer;
             padding: 8px 16px;

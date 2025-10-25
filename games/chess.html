@@ -84,7 +84,116 @@
             transform: scale(1.05);
         }
         
-        @media (max-width: 1024px) { .container { grid-template-columns: 1fr; justify-items: center; } .side { width: 640px; height: auto; } }
+        /* 平板适配 */
+        @media (max-width: 1024px) { 
+            .container { 
+                grid-template-columns: 1fr; 
+                justify-items: center; 
+                max-width: 100%;
+                padding: 0 12px;
+            } 
+            .side { 
+                width: 100%; 
+                max-width: 640px; 
+                height: auto; 
+            } 
+        }
+        
+        /* 手机适配 */
+        @media (max-width: 768px) {
+            body {
+                padding: 12px 8px;
+            }
+            h1 {
+                font-size: 24px;
+                text-align: center;
+            }
+            .subtitle {
+                font-size: 14px;
+                text-align: center;
+                margin-bottom: 12px;
+            }
+            .container {
+                grid-template-columns: 1fr;
+                gap: 16px;
+                padding: 0;
+                width: 100%;
+            }
+            .board {
+                width: min(calc(100vw - 16px), 500px);
+                height: min(calc(100vw - 16px), 500px);
+                margin: 0 auto;
+            }
+            .side {
+                width: 100%;
+                max-width: min(calc(100vw - 16px), 500px);
+                height: auto;
+                margin: 0 auto;
+            }
+            .row {
+                flex-wrap: wrap;
+            }
+            .row > label {
+                width: 100%;
+                margin-bottom: 4px;
+            }
+            select, button {
+                width: 100%;
+                padding: 10px;
+                font-size: 16px;
+            }
+            .history {
+                max-height: 200px;
+            }
+            .game-over-content {
+                max-width: calc(100vw - 32px);
+                padding: 24px;
+            }
+            .game-over-content h2 {
+                font-size: 36px;
+            }
+            .game-over-content p {
+                font-size: 18px;
+            }
+            .promo .choice {
+                font-size: 36px;
+            }
+        }
+        
+        /* 小屏手机适配 */
+        @media (max-width: 480px) {
+            body {
+                padding: 8px 4px;
+            }
+            h1 {
+                font-size: 20px;
+            }
+            .subtitle {
+                font-size: 12px;
+            }
+            .board {
+                width: calc(100vw - 8px);
+                height: calc(100vw - 8px);
+            }
+            .side {
+                width: calc(100vw - 8px);
+            }
+            .status, .history h3 {
+                font-size: 13px;
+            }
+            .list {
+                font-size: 12px;
+            }
+            .game-over-content {
+                padding: 20px;
+            }
+            .game-over-content h2 {
+                font-size: 28px;
+            }
+            .game-over-content p {
+                font-size: 16px;
+            }
+        }
     </style>
     <script type="module">
         // 多语言支持
@@ -359,7 +468,27 @@
             const piece = game.get(sq);
             if(selectedSq===sq){ selectedSq=null; clearHighlights(); return; }
             if(!selectedSq){ if(piece && piece.color===game.turn()){ selectedSq=sq; clearHighlights(); target.classList.add('selected'); highlightMoves(sq);} return; }
-            const isPromotion = (game.get(selectedSq)?.type==='p') && ((game.turn()==='w' && sq.endsWith('8')) || (game.turn()==='b' && sq.endsWith('1')));
+            
+            // 检查这步棋是否合法
+            const validMoves = game.moves({ square: selectedSq, verbose: true });
+            const isValidMove = validMoves.some(m => m.to === sq);
+            if(!isValidMove){ 
+                // 如果不是合法移动，取消选择或重新选择
+                if(piece && piece.color===game.turn()){ 
+                    selectedSq=sq; 
+                    clearHighlights(); 
+                    target.classList.add('selected'); 
+                    highlightMoves(sq);
+                } else {
+                    selectedSq=null; 
+                    clearHighlights();
+                }
+                return; 
+            }
+            
+            // 只有在合法移动的情况下才检查是否需要升变
+            const moveInfo = validMoves.find(m => m.to === sq);
+            const isPromotion = moveInfo && moveInfo.flags.includes('p');
             if(isPromotion){ showPromotion().then(prom=>{ tryMove(selectedSq,sq,prom); }); } else { tryMove(selectedSq,sq,undefined); }
         });
         function tryMove(from,to,promotion){ const res = game.move({from,to,promotion}); if(res){ selectedSq=null; clearHighlights(); render(); maybeAIMove(); } }
