@@ -36,6 +36,88 @@
         @media (max-width: 1024px) { .container { grid-template-columns: 1fr; justify-items: center; } .side { width: 640px; height: auto; } }
     </style>
     <script type="module">
+        // 多语言支持
+        let currentLang = localStorage.getItem('chess-language') || 'en';
+        
+        const i18n = {
+            en: {
+                title: 'Chess - Real Stockfish AI',
+                subtitle: 'Complete rules · Stockfish engine · Multiple difficulty levels',
+                opponent: 'Opponent',
+                opponentAI: 'AI (Stockfish)',
+                opponentHuman: 'Local 2 Player',
+                yourSide: 'You Play',
+                white: 'White',
+                black: 'Black',
+                difficulty: 'Difficulty',
+                veryEasy: 'Very Easy',
+                easy: 'Easy',
+                medium: 'Medium',
+                hard: 'Hard',
+                expert: 'Expert',
+                depth: 'Depth',
+                newGame: 'New Game',
+                undo: 'Undo',
+                status: 'Status',
+                inGame: 'In Game',
+                check: 'Check',
+                checkmate: 'Checkmate',
+                draw: 'Draw',
+                turnWhite: 'Turn: White',
+                turnBlack: 'Turn: Black',
+                moveHistory: 'Move History',
+                promotion: 'Promote to:',
+                aiThinking: 'AI thinking...',
+                aiMoved: 'AI moved',
+                gameOverCheckmate: '🎉 Game Over!\n\n{winner} wins!\n\n{loser} is checkmated',
+                gameOverDraw: '🤝 Game Over!\n\nDraw',
+                whiteWins: 'White',
+                blackWins: 'Black',
+                whiteCheckmated: 'Black',
+                blackCheckmated: 'White'
+            },
+            zh: {
+                title: '国际象棋 - 真正的 Stockfish AI',
+                subtitle: '完整规则 · Stockfish 引擎 · 多难度级别',
+                opponent: '对手',
+                opponentAI: 'AI (Stockfish)',
+                opponentHuman: '本地双人',
+                yourSide: '你执',
+                white: '白',
+                black: '黑',
+                difficulty: '难度',
+                veryEasy: '极易',
+                easy: '简单',
+                medium: '中等',
+                hard: '困难',
+                expert: '专家',
+                depth: '深度',
+                newGame: '新局',
+                undo: '悔棋',
+                status: '状态',
+                inGame: '游戏中',
+                check: '将军',
+                checkmate: '将死',
+                draw: '和棋',
+                turnWhite: '轮到: 白',
+                turnBlack: '轮到: 黑',
+                moveHistory: '走子记录',
+                promotion: '升变为：',
+                aiThinking: 'AI 思考中...',
+                aiMoved: 'AI 已走棋',
+                gameOverCheckmate: '🎉 游戏结束！\n\n{winner}获胜！\n\n{loser}被将死',
+                gameOverDraw: '🤝 游戏结束！\n\n和棋',
+                whiteWins: '白方',
+                blackWins: '黑方',
+                whiteCheckmated: '白方',
+                blackCheckmated: '黑方'
+            }
+        };
+        
+        function t(key) {
+            return i18n[currentLang][key] || key;
+        }
+        
         // 动态导入 chess.js
         async function importWithFallback(candidates) {
             for (const url of candidates) {
@@ -97,28 +179,33 @@
         }
 
         // 页面骨架
-        const h1 = document.createElement('h1'); h1.textContent = '国际象棋 - 真正的 Stockfish AI';
-        const subtitle = document.createElement('div'); subtitle.className = 'subtitle'; subtitle.textContent = '完整规则 · 真正的 Stockfish 引擎 · 多难度级别';
+        const h1 = document.createElement('h1'); h1.id = 'game-title'; h1.textContent = t('title');
+        const subtitle = document.createElement('div'); subtitle.id = 'game-subtitle'; subtitle.className = 'subtitle'; subtitle.textContent = t('subtitle');
         const container = document.createElement('div'); container.className = 'container';
         const board = document.createElement('div'); board.className = 'board';
         const side = document.createElement('div'); side.className = 'side';
         document.body.appendChild(h1); document.body.appendChild(subtitle); document.body.appendChild(container);
         container.appendChild(board); container.appendChild(side);
-        side.innerHTML = ''+
-        '<div class="row"><label>对手</label><select id="opponent"><option value="ai" selected>AI (Stockfish)</option><option value="human">本地双人</option></select></div>'+
-        '<div class="row"><label>你执</label><select id="side"><option value="w" selected>白</option><option value="b">黑</option></select></div>'+
-        '<div class="row"><label>难度</label><select id="level"><option value="1">极易</option><option value="5">简单</option><option value="10" selected>中等</option><option value="15">困难</option><option value="20">专家</option></select></div>'+
-        '<div class="row"><label>深度</label><select id="depth"><option value="5">5</option><option value="10" selected>10</option><option value="15">15</option><option value="20">20</option></select></div>'+
-        '<div class="row" style="gap:10px; margin-top:4px;"><button id="new">新局</button><button id="undo">悔棋</button></div>'+
-        '<div class="status" id="status">状态: 游戏中</div>'+
-        '<div class="history"><h3>走子记录</h3><div class="list" id="moves"></div></div>';
+        
+        function renderSidePanel() {
+            side.innerHTML = ''+
+            `<div class="row"><label>${t('opponent')}</label><select id="opponent"><option value="ai" selected>${t('opponentAI')}</option><option value="human">${t('opponentHuman')}</option></select></div>`+
+            `<div class="row"><label>${t('yourSide')}</label><select id="side"><option value="w" selected>${t('white')}</option><option value="b">${t('black')}</option></select></div>`+
+            `<div class="row"><label>${t('difficulty')}</label><select id="level"><option value="1">${t('veryEasy')}</option><option value="5">${t('easy')}</option><option value="10" selected>${t('medium')}</option><option value="15">${t('hard')}</option><option value="20">${t('expert')}</option></select></div>`+
+            `<div class="row"><label>${t('depth')}</label><select id="depth"><option value="5">5</option><option value="10" selected>10</option><option value="15">15</option><option value="20">20</option></select></div>`+
+            `<div class="row" style="gap:10px; margin-top:4px;"><button id="new">${t('newGame')}</button><button id="undo">${t('undo')}</button></div>`+
+            `<div class="status" id="status">${t('status')}: ${t('inGame')}</div>`+
+            `<div class="history"><h3>${t('moveHistory')}</h3><div class="list" id="moves"></div></div>`;
+        }
+        renderSidePanel();
+        
         const promoMask = document.createElement('div'); promoMask.className = 'promo-mask';
-        promoMask.innerHTML = '<div class="promo"><h4>升变为：</h4><div class="choices">\
+        promoMask.innerHTML = `<div class="promo"><h4 id="promo-title">${t('promotion')}</h4><div class="choices">\
             <span class="choice" data-q="q">♛</span>\
             <span class="choice" data-q="r">♜</span>\
             <span class="choice" data-q="b">♝</span>\
             <span class="choice" data-q="n">♞</span>\
-        </div></div>';
+        </div></div>`;
         document.body.appendChild(promoMask);
 
         // 棋局与渲染
@@ -215,36 +302,40 @@
         let gameEnded = false;
         
         function updateStatus() {
-            let t = '状态: ';
+            let statusText = t('status') + ': ';
             
             if (game.isCheckmate()) {
-                t += '将死';
-                const winner = game.turn() === 'w' ? '黑方' : '白方';
-                statusEl.textContent = t + ` · ${winner}获胜！`;
+                statusText += t('checkmate');
+                const winner = game.turn() === 'w' ? t('blackWins') : t('whiteWins');
+                statusEl.textContent = statusText + ` · ${winner} wins!`;
                 
                 // 防止重复弹窗
                 if (!gameEnded) {
                     gameEnded = true;
                     setTimeout(() => {
-                        alert(`🎉 游戏结束！\n\n${winner}获胜！\n\n${game.turn() === 'w' ? '白方' : '黑方'}被将死`);
+                        const loser = game.turn() === 'w' ? t('whiteCheckmated') : t('blackCheckmated');
+                        const msg = t('gameOverCheckmate')
+                            .replace('{winner}', winner)
+                            .replace('{loser}', loser);
+                        alert(msg);
                     }, 300);
                 }
             } else if (game.isDraw()) {
-                t += '和棋';
-                statusEl.textContent = t + ' · 平局';
+                statusText += t('draw');
+                statusEl.textContent = statusText + ' · Draw';
                 
                 if (!gameEnded) {
                     gameEnded = true;
                     setTimeout(() => {
-                        alert('🤝 游戏结束！\n\n和棋 - 平局');
+                        alert(t('gameOverDraw'));
                     }, 300);
                 }
             } else if (game.inCheck()) {
-                t += '将军';
-                statusEl.textContent = t + ` · 轮到: ${game.turn() === 'w' ? '白' : '黑'}`;
+                statusText += t('check');
+                statusEl.textContent = statusText + ` · ${game.turn() === 'w' ? t('turnWhite') : t('turnBlack')}`;
             } else {
-                t += '游戏中';
-                statusEl.textContent = t + ` · 轮到: ${game.turn() === 'w' ? '白' : '黑'}`;
+                statusText += t('inGame');
+                statusEl.textContent = statusText + ` · ${game.turn() === 'w' ? t('turnWhite') : t('turnBlack')}`;
             }
         }
         document.getElementById('new').onclick = ()=>{ gameEnded = false; game.reset(); render(); maybeAIMove(true); };
@@ -278,7 +369,7 @@
                     
                     setTimeout(() => {
                         tryMove(from, to, promo);
-                        statusEl.textContent = '状态: AI 已走棋';
+                        statusEl.textContent = t('status') + ': ' + t('aiMoved');
                     }, 100);
                 }
             }
@@ -300,7 +391,7 @@
             if (force && humanColor === 'w' && game.history().length === 0) return;
             
             console.log('🤖 AI is thinking...');
-            statusEl.textContent = '状态: AI 思考中...';
+            statusEl.textContent = t('status') + ': ' + t('aiThinking');
             
             const level = parseInt(document.getElementById('level').value, 10);
             const depth = parseInt(document.getElementById('depth').value, 10);
@@ -321,6 +412,53 @@
         // 初始渲染
         render();
         setTimeout(() => maybeAIMove(true), 1000);
+        
+        // 监听来自父页面的语言切换消息
+        window.addEventListener('message', function(event) {
+            if (event.data && event.data.type === 'languageChange') {
+                currentLang = event.data.lang;
+                localStorage.setItem('chess-language', currentLang);
+                
+                // 更新所有文本
+                document.getElementById('game-title').textContent = t('title');
+                document.getElementById('game-subtitle').textContent = t('subtitle');
+                document.getElementById('promo-title').textContent = t('promotion');
+                
+                // 重新渲染侧边栏
+                const savedValues = {
+                    opponent: document.getElementById('opponent').value,
+                    side: document.getElementById('side').value,
+                    level: document.getElementById('level').value,
+                    depth: document.getElementById('depth').value
+                };
+                
+                renderSidePanel();
+                
+                // 恢复选中的值
+                document.getElementById('opponent').value = savedValues.opponent;
+                document.getElementById('side').value = savedValues.side;
+                document.getElementById('level').value = savedValues.level;
+                document.getElementById('depth').value = savedValues.depth;
+                
+                // 重新绑定事件
+                document.getElementById('new').onclick = ()=>{ gameEnded = false; game.reset(); render(); maybeAIMove(true); };
+                document.getElementById('undo').onclick = ()=>{ game.undo(); game.undo(); render(); };
+                document.getElementById('opponent').onchange = ()=>{ render(); maybeAIMove(true); };
+                document.getElementById('side').onchange = ()=>{ gameEnded = false; game.reset(); render(); maybeAIMove(true); };
+                
+                // 更新状态显示
+                updateStatus();
+                
+                console.log('Language changed to:', currentLang);
+            }
+        });
+        
+        // 同步父页面的语言设置
+        const parentLang = localStorage.getItem('site-language');
+        if (parentLang && parentLang !== currentLang) {
+            currentLang = parentLang;
+            localStorage.setItem('chess-language', currentLang);
+        }
     </script>
 </head>
 <body></body>

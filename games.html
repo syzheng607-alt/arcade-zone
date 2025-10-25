@@ -39,6 +39,23 @@
             text-shadow: 0 0 10px var(--orange), 0 0 20px var(--orange), 0 0 30px var(--orange);
         }
         
+        .lang-switch {
+            cursor: pointer;
+            padding: 8px 16px;
+            background: rgba(255, 107, 53, 0.2);
+            border: 2px solid var(--orange);
+            border-radius: 8px;
+            color: white;
+            font-weight: bold;
+            transition: all 0.3s;
+            font-family: 'Rajdhani', sans-serif;
+        }
+        
+        .lang-switch:hover {
+            background: var(--orange);
+            transform: scale(1.05);
+        }
+        
         .game-card {
             background: linear-gradient(145deg, var(--dark-green), var(--light-green));
             border: 2px solid var(--gray);
@@ -203,10 +220,13 @@
                 </div>
                 <div class="hidden md:block">
                     <div class="ml-10 flex items-baseline space-x-8">
-                        <a href="index.html" class="nav-link font-semibold">Home</a>
-                        <a href="games.html" class="nav-link font-semibold text-orange">Games</a>
-                        <a href="purchase.html" class="nav-link font-semibold">Purchase</a>
-                        <a href="contact.html" class="nav-link font-semibold">Contact Us</a>
+                        <a href="index.html" class="nav-link font-semibold" data-i18n="nav.home">Home</a>
+                        <a href="games.html" class="nav-link font-semibold text-orange" data-i18n="nav.games">Games</a>
+                        <a href="purchase.html" class="nav-link font-semibold" data-i18n="nav.purchase">Purchase</a>
+                        <a href="contact.html" class="nav-link font-semibold" data-i18n="nav.contact">Contact Us</a>
+                        <button class="lang-switch" onclick="toggleLanguage()">
+                            <span class="lang-display">中文</span>
+                        </button>
                     </div>
                 </div>
                 <div id="auth-nav-container">
@@ -225,10 +245,13 @@
         <!-- Mobile menu -->
         <div id="mobile-menu" class="md:hidden hidden bg-black bg-opacity-95">
             <div class="px-2 pt-2 pb-3 space-y-1">
-                <a href="index.html" class="nav-link block px-3 py-2 font-semibold">Home</a>
-                <a href="games.html" class="nav-link block px-3 py-2 font-semibold text-orange">Games</a>
-                <a href="purchase.html" class="nav-link block px-3 py-2 font-semibold">Purchase</a>
-                <a href="contact.html" class="nav-link block px-3 py-2 font-semibold">Contact Us</a>
+                <a href="index.html" class="nav-link block px-3 py-2 font-semibold" data-i18n="nav.home">Home</a>
+                <a href="games.html" class="nav-link block px-3 py-2 font-semibold text-orange" data-i18n="nav.games">Games</a>
+                <a href="purchase.html" class="nav-link block px-3 py-2 font-semibold" data-i18n="nav.purchase">Purchase</a>
+                <a href="contact.html" class="nav-link block px-3 py-2 font-semibold" data-i18n="nav.contact">Contact Us</a>
+                <button class="lang-switch w-full text-left px-3 py-2" onclick="toggleLanguage()">
+                    <span data-i18n="nav.language">Language</span>: <span class="lang-display">中文</span>
+                </button>
             </div>
         </div>
     </nav>
@@ -301,7 +324,7 @@
                             <span class="text-orange font-bold">FREE</span>
                             <span class="text-gray-400 text-sm">2.5k players</span>
                         </div>
-                        <a href="games/chess.html" class="play-button w-full py-2 rounded-lg font-bold block text-center">PLAY NOW</a>
+                        <a href="play.html" class="play-button w-full py-2 rounded-lg font-bold block text-center" data-i18n="game.playNow">PLAY NOW</a>
                     </div>
                 </div>
                 
@@ -805,5 +828,7 @@
             });
         }
     </script>
+    <script src="i18n.js"></script>
+    <script src="auth.js"></script>
 </body>
 </html>
