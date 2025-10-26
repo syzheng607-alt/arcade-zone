@@ -165,6 +165,9 @@
         const authContainers = document.querySelectorAll('#auth-nav-container');
         
         authContainers.forEach(container => {
+            // 确保容器可见（移除 hidden 类，保留其他类）
+            container.classList.remove('hidden');
+            
             if (isLoggedIn && window.userProfile) {
                 // 已登录状态
                 container.innerHTML = `
