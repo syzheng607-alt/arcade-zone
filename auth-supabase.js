@@ -223,21 +223,24 @@
     // 用户登出
     async function signOut() {
         try {
+            console.log('🔓 Signing out...');
+            
+            // 清除用户profile缓存（在 signOut 之前，确保有 currentUser）
+            if (window.currentUser) {
+                const cacheKey = `user_profile_${window.currentUser.id}`;
+                localStorage.removeItem(cacheKey);
+                console.log('🗑️ Cleared profile cache for user:', window.currentUser.email);
+            }
+            
             const { error } = await window.supabase.auth.signOut();
             
             if (error) throw error;
             
-            // 清除用户profile缓存
-            if (window.currentUser) {
-                const cacheKey = `user_profile_${window.currentUser.id}`;
-                localStorage.removeItem(cacheKey);
-                console.log('🗑️ Cleared profile cache');
-            }
-            
+            console.log('✅ Supabase signOut successful');
             return { success: true };
             
         } catch (error) {
-            console.error('Sign out error:', error);
+            console.error('❌ Sign out error:', error);
             return { success: false, error: error.message };
         }
     }
@@ -474,13 +477,28 @@
     
     // 处理登出
     async function handleLogout() {
+        console.log('🚪 handleLogout called');
         const result = await signOut();
         if (result.success) {
+            console.log('✅ Sign out successful');
+            
+            // 清除全局状态
+            window.currentUser = null;
+            window.userProfile = null;
+            
+            // 立即更新 UI（不依赖事件触发）
+            updateUI(false);
+            console.log('🔄 UI updated to logged out state');
+            
             showNotification('已登出', 'success');
+            
             // 如果在个人中心页面，跳转到首页
             if (window.location.pathname.includes('profile.html')) {
                 window.location.href = 'index.html';
             }
+        } else {
+            console.error('❌ Sign out failed:', result.error);
+            showNotification('登出失败: ' + result.error, 'error');
         }
     }
     
