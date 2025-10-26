@@ -201,66 +201,20 @@
         </div>
     </footer>
     
-    <script src="i18n.js"></script>
     <script src="supabase-config.js"></script>
     <script src="supabase-client.js"></script>
     <script src="auth-supabase.js"></script>
+    <script src="i18n.js"></script>
     <script>
-        const translations = {
-            en: {
-                'nav.home': 'Home',
-                'nav.games': 'Games',
-                'nav.purchase': 'Purchase',
-                'nav.contact': 'Contact',
-                'nav.language': 'Language',
-                'footer.description': 'Your ultimate destination for arcade gaming',
-                'footer.privacy': 'Privacy Policy',
-                'footer.terms': 'Terms of Service',
-                'footer.copyright': '© 2024 ArcadeZone. All rights reserved.'
-            },
-            zh: {
-                'nav.home': '首页',
-                'nav.games': '游戏',
-                'nav.purchase': '购买',
-                'nav.contact': '联系我们',
-                'nav.language': '语言',
-                'footer.description': '您的终极街机游戏目的地',
-                'footer.privacy': '隐私政策',
-                'footer.terms': '服务条款',
-                'footer.copyright': '© 2024 ArcadeZone. 保留所有权利。'
-            }
-        };
-        
-        let currentLang = localStorage.getItem('language') || 'en';
-        
-        function applyTranslations() {
-            document.querySelectorAll('[data-i18n]').forEach(element => {
-                const key = element.getAttribute('data-i18n');
-                if (translations[currentLang][key]) {
-                    element.textContent = translations[currentLang][key];
-                }
+        // i18n.js 已经处理了所有翻译功能
+        // 只保留移动菜单交互
+        const menuBtn = document.getElementById('mobile-menu-btn');
+        if (menuBtn) {
+            menuBtn.addEventListener('click', () => {
+                const menu = document.getElementById('mobile-menu');
+                if (menu) menu.classList.toggle('hidden');
             });
-            
-            const langDisplay = currentLang === 'en' ? '中文' : 'English';
-            document.getElementById('lang-display').textContent = langDisplay;
-            const mobileLangDisplay = document.getElementById('lang-display-mobile');
-            if (mobileLangDisplay) {
-                mobileLangDisplay.textContent = langDisplay;
-            }
         }
-        
-        function toggleLanguage() {
-            currentLang = currentLang === 'en' ? 'zh' : 'en';
-            localStorage.setItem('language', currentLang);
-            applyTranslations();
-        }
-        
-        document.getElementById('mobile-menu-btn').addEventListener('click', () => {
-            const menu = document.getElementById('mobile-menu');
-            menu.classList.toggle('hidden');
-        });
-        
-        applyTranslations();
     </script>
 </body>
 </html>

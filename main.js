@@ -189,6 +189,13 @@ function initStatsCounter() {
         { id: 'hours-count', target: 1000000 }
     ];
     
+    // 检查页面是否有 stats-card 元素
+    const firstStatsCard = document.querySelector('.stats-card');
+    if (!firstStatsCard) {
+        // 如果页面没有统计卡片，直接返回，避免错误
+        return;
+    }
+    
     // Animate counters when they come into view
     const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
@@ -201,7 +208,7 @@ function initStatsCounter() {
         });
     });
     
-    const statsSection = document.querySelector('.stats-card').parentElement.parentElement;
+    const statsSection = firstStatsCard.parentElement.parentElement;
     if (statsSection) {
         observer.observe(statsSection);
     }
