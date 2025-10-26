@@ -50,12 +50,20 @@
     window.supabase.auth.onAuthStateChange(async (event, session) => {
         console.log('🔄 Auth event:', event, 'Session:', session ? 'exists' : 'null');
         
-        if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
-            console.log('📝 Handling SIGNED_IN/TOKEN_REFRESHED');
-            window.currentUser = session.user;
-            await loadUserProfile();
-            console.log('📋 Profile loaded in event handler, calling updateUI(true)');
-            updateUI(true);
+        if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'INITIAL_SESSION') {
+            console.log('📝 Handling', event);
+            
+            if (session && session.user) {
+                window.currentUser = session.user;
+                await loadUserProfile();
+                console.log('📋 Profile loaded in event handler, calling updateUI(true)');
+                updateUI(true);
+            } else {
+                console.log('⚠️ Session exists but no user, calling updateUI(false)');
+                window.currentUser = null;
+                window.userProfile = null;
+                updateUI(false);
+            }
         } else if (event === 'SIGNED_OUT') {
             console.log('📝 Handling SIGNED_OUT');
             window.currentUser = null;
