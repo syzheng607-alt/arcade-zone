@@ -79,7 +79,7 @@
         }
     });
     
-    // 加载用户资料（带超时保护）
+    // 加载用户资料（带缓存优化）
     async function loadUserProfile() {
         console.log('🔄 loadUserProfile called, currentUser:', window.currentUser?.email);
         if (!window.currentUser) {
@@ -87,20 +87,33 @@
             return;
         }
         
-        // 设置默认 fallback profile
+        const cacheKey = `user_profile_${window.currentUser.id}`;
+        
+        // 1. 先尝试从 localStorage 加载缓存（立即显示）
+        const cachedProfile = localStorage.getItem(cacheKey);
+        if (cachedProfile) {
+            try {
+                window.userProfile = JSON.parse(cachedProfile);
+                console.log('⚡ Using cached profile:', window.userProfile.username);
+                // 立即显示缓存的用户名
+                updateUI(true);
+            } catch (e) {
+                console.warn('⚠️ Failed to parse cached profile:', e);
+            }
+        }
+        
+        // 2. 后台异步从数据库加载最新数据
         const fallbackProfile = {
             username: window.currentUser.email.split('@')[0],
             id: window.currentUser.id
         };
         
         try {
-            console.log('📡 Fetching profile from database...');
-            console.log('   - User ID:', window.currentUser.id);
-            console.log('   - Supabase client:', window.supabase ? 'exists' : 'null');
+            console.log('📡 Fetching latest profile from database...');
             
-            // 使用 Promise.race 添加 3 秒超时
+            // 使用 Promise.race 添加 2 秒超时
             const timeoutPromise = new Promise((_, reject) => {
-                setTimeout(() => reject(new Error('Database query timeout after 3s')), 3000);
+                setTimeout(() => reject(new Error('Database query timeout after 2s')), 2000);
             });
             
             const queryPromise = window.supabase
@@ -114,28 +127,30 @@
             console.log('📦 Database response:', { data, error });
             
             if (error) {
-                console.error('❌ Failed to load profile:', error.message, error.code);
-                window.userProfile = fallbackProfile;
-                console.log('⚠️ Using fallback profile:', window.userProfile.username);
-                console.log('✅ loadUserProfile completed (with fallback)');
-                // 重要：调用 updateUI 显示用户名
-                updateUI(true);
+                console.warn('⚠️ Database query failed:', error.message);
+                if (!cachedProfile) {
+                    window.userProfile = fallbackProfile;
+                    updateUI(true);
+                }
                 return;
             }
             
+            // 3. 更新缓存和显示
             window.userProfile = data;
-            console.log('✅ Profile loaded successfully:', window.userProfile);
-            console.log('✅ loadUserProfile completed (success)');
-            // 重要：调用 updateUI 显示用户名
-            updateUI(true);
+            localStorage.setItem(cacheKey, JSON.stringify(data));
+            console.log('✅ Profile loaded and cached:', window.userProfile.username);
+            
+            // 如果profile有变化，更新UI
+            if (!cachedProfile || JSON.stringify(data) !== cachedProfile) {
+                updateUI(true);
+            }
             
         } catch (error) {
-            console.error('❌ Error loading profile (exception):', error.message);
-            window.userProfile = fallbackProfile;
-            console.log('⚠️ Using fallback profile after exception:', window.userProfile.username);
-            console.log('✅ loadUserProfile completed (after exception)');
-            // 重要：即使出错也调用 updateUI 显示用户名
-            updateUI(true);
+            console.warn('⚠️ Error loading profile:', error.message);
+            if (!cachedProfile) {
+                window.userProfile = fallbackProfile;
+                updateUI(true);
+            }
         }
     }
     
@@ -211,6 +226,13 @@
             const { error } = await window.supabase.auth.signOut();
             
             if (error) throw error;
+            
+            // 清除用户profile缓存
+            if (window.currentUser) {
+                const cacheKey = `user_profile_${window.currentUser.id}`;
+                localStorage.removeItem(cacheKey);
+                console.log('🗑️ Cleared profile cache');
+            }
             
             return { success: true };
             
