@@ -197,9 +197,16 @@
         }
     }
     
-    // 更新UI
+    // 更新UI（确保 DOM 已准备好）
     function updateUI(isLoggedIn) {
-        console.log('🎨 updateUI called, isLoggedIn:', isLoggedIn, 'userProfile:', window.userProfile);
+        console.log('🎨 updateUI called, isLoggedIn:', isLoggedIn, 'userProfile:', window.userProfile, 'isDOMReady:', isDOMReady);
+        
+        // 如果 DOM 还没准备好，延迟执行
+        if (!isDOMReady) {
+            console.log('⏳ DOM not ready yet, queuing UI update...');
+            ensureDOMReady(() => updateUI(isLoggedIn));
+            return;
+        }
         
         const authContainers = document.querySelectorAll('#auth-nav-container');
         console.log('📦 Found', authContainers.length, 'auth containers');
@@ -443,10 +450,35 @@
         isLoggedIn: () => !!window.currentUser
     };
     
+    // 全局标记，确保 updateUI 在 DOM 准备好后才执行
+    let isDOMReady = false;
+    let pendingUIUpdate = null;
+    
+    function ensureDOMReady(callback) {
+        if (isDOMReady) {
+            callback();
+        } else {
+            pendingUIUpdate = callback;
+        }
+    }
+    
+    function markDOMReady() {
+        isDOMReady = true;
+        if (pendingUIUpdate) {
+            console.log('🎯 DOM ready, executing pending UI update');
+            pendingUIUpdate();
+            pendingUIUpdate = null;
+        }
+    }
+    
     // 页面加载时初始化
     if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', initAuth);
+        document.addEventListener('DOMContentLoaded', () => {
+            markDOMReady();
+            initAuth();
+        });
     } else {
+        markDOMReady();
         initAuth();
     }
     
