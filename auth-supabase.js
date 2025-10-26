@@ -69,9 +69,14 @@
     
     // 加载用户资料
     async function loadUserProfile() {
-        if (!window.currentUser) return;
+        console.log('🔄 loadUserProfile called, currentUser:', window.currentUser?.email);
+        if (!window.currentUser) {
+            console.log('⚠️ No currentUser, returning early');
+            return;
+        }
         
         try {
+            console.log('📡 Fetching profile from database...');
             const { data, error } = await window.supabase
                 .from('profiles')
                 .select('*')
@@ -79,15 +84,27 @@
                 .single();
             
             if (error) {
-                console.error('Failed to load profile:', error);
+                console.error('❌ Failed to load profile:', error);
+                // 即使加载失败，也要设置一个默认 profile，让 UI 能显示
+                window.userProfile = {
+                    username: window.currentUser.email.split('@')[0],
+                    id: window.currentUser.id
+                };
+                console.log('⚠️ Using fallback profile:', window.userProfile.username);
                 return;
             }
             
             window.userProfile = data;
-            console.log('✅ Profile loaded:', window.userProfile.username);
+            console.log('✅ Profile loaded successfully:', window.userProfile.username);
             
         } catch (error) {
-            console.error('Error loading profile:', error);
+            console.error('❌ Error loading profile:', error);
+            // 设置fallback profile
+            window.userProfile = {
+                username: window.currentUser.email.split('@')[0],
+                id: window.currentUser.id
+            };
+            console.log('⚠️ Using fallback profile after error:', window.userProfile.username);
         }
     }
     
