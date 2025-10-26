@@ -162,11 +162,18 @@
     
     // 更新UI
     function updateUI(isLoggedIn) {
-        const authContainers = document.querySelectorAll('#auth-nav-container');
+        console.log('🎨 updateUI called, isLoggedIn:', isLoggedIn, 'userProfile:', window.userProfile);
         
-        authContainers.forEach(container => {
+        const authContainers = document.querySelectorAll('#auth-nav-container');
+        console.log('📦 Found', authContainers.length, 'auth containers');
+        
+        authContainers.forEach((container, index) => {
+            console.log(`🔧 Processing container ${index}:`, container);
+            console.log(`   - Has 'hidden' class:`, container.classList.contains('hidden'));
+            
             // 确保容器可见（移除 hidden 类，保留其他类）
             container.classList.remove('hidden');
+            console.log(`   - After remove 'hidden':`, container.classList.contains('hidden'));
             
             if (isLoggedIn && window.userProfile) {
                 // 已登录状态
@@ -185,6 +192,9 @@
                 const logoutBtn = container.querySelector('#logout-btn');
                 if (logoutBtn) {
                     logoutBtn.addEventListener('click', handleLogout);
+                    console.log(`   ✅ Logged-in UI inserted for container ${index}`);
+                } else {
+                    console.error(`   ❌ Failed to find logout button in container ${index}`);
                 }
                 
             } else {
@@ -204,8 +214,15 @@
                 const loginBtn = container.querySelector('#login-btn');
                 const signupBtn = container.querySelector('#signup-btn');
                 
-                if (loginBtn) loginBtn.addEventListener('click', showLoginModal);
+                if (loginBtn) {
+                    loginBtn.addEventListener('click', showLoginModal);
+                    console.log(`   ✅ Login/Signup UI inserted for container ${index}`);
+                } else {
+                    console.error(`   ❌ Failed to find login button in container ${index}`);
+                }
                 if (signupBtn) signupBtn.addEventListener('click', showSignupModal);
+            } else {
+                console.log(`   ⚠️ Skipping container ${index}: isLoggedIn=${isLoggedIn}, hasProfile=${!!window.userProfile}`);
             }
         });
     }

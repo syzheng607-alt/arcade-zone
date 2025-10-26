@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>认证系统测试</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body class="bg-gray-900 text-white p-8">
+    <div class="max-w-4xl mx-auto">
+        <h1 class="text-3xl font-bold mb-8">🔍 认证系统诊断</h1>
+        
+        <div class="space-y-4">
+            <div class="bg-gray-800 p-4 rounded">
+                <h2 class="text-xl font-bold mb-2">1. 测试容器</h2>
+                <div id="auth-nav-container" class="hidden md:block bg-gray-700 p-4 rounded">
+                    <!-- Auth buttons will be inserted here -->
+                </div>
+            </div>
+            
+            <div class="bg-gray-800 p-4 rounded">
+                <h2 class="text-xl font-bold mb-2">2. 加载状态</h2>
+                <pre id="log" class="bg-gray-900 p-4 rounded text-sm overflow-auto max-h-96"></pre>
+            </div>
+            
+            <div class="bg-gray-800 p-4 rounded">
+                <h2 class="text-xl font-bold mb-2">3. 检查结果</h2>
+                <ul id="checks" class="space-y-2"></ul>
+            </div>
+        </div>
+    </div>
+    
+    <script src="supabase-config.js"></script>
+    <script src="supabase-client.js"></script>
+    <script src="auth-supabase.js"></script>
+    
+    <script>
+        const log = document.getElementById('log');
+        const checks = document.getElementById('checks');
+        
+        function addLog(message) {
+            log.textContent += message + '\n';
+            console.log(message);
+        }
+        
+        function addCheck(message, status) {
+            const li = document.createElement('li');
+            li.className = 'flex items-center space-x-2';
+            li.innerHTML = `
+                <span class="${status ? 'text-green-500' : 'text-red-500'} text-xl">
+                    ${status ? '✅' : '❌'}
+                </span>
+                <span>${message}</span>
+            `;
+            checks.appendChild(li);
+        }
+        
+        // 劫持 console.log 来显示所有日志
+        const originalLog = console.log;
+        console.log = function(...args) {
+            originalLog.apply(console, args);
+            addLog(args.join(' '));
+        };
+        
+        // 等待一切加载完成后检查
+        setTimeout(() => {
+            addLog('\n=== 开始诊断 ===\n');
+            
+            // 检查 1: Supabase SDK
+            addCheck('Supabase SDK 已加载', typeof supabase !== 'undefined');
+            
+            // 检查 2: 配置文件
+            addCheck('supabase-config.js 已加载', typeof SUPABASE_CONFIG !== 'undefined');
+            
+            // 检查 3: 客户端
+            addCheck('supabase-client.js 已加载', typeof window.supabase !== 'undefined');
+            
+            // 检查 4: 认证系统
+            addCheck('auth-supabase.js 已加载', typeof window.AuthSystem !== 'undefined');
+            
+            // 检查 5: 容器
+            const container = document.getElementById('auth-nav-container');
+            addCheck('auth-nav-container 存在', container !== null);
+            
+            // 检查 6: 容器内容
+            const hasContent = container && container.innerHTML.trim().length > 50;
+            addCheck('auth-nav-container 有内容', hasContent);
+            
+            // 检查 7: 容器可见性
+            const isVisible = container && !container.classList.contains('hidden');
+            addCheck('auth-nav-container 可见', isVisible);
+            
+            // 检查 8: Supabase 配置
+            if (typeof SUPABASE_CONFIG !== 'undefined') {
+                const hasValidConfig = SUPABASE_CONFIG.url && 
+                                      SUPABASE_CONFIG.url !== 'YOUR_SUPABASE_URL_HERE' &&
+                                      SUPABASE_CONFIG.anonKey && 
+                                      SUPABASE_CONFIG.anonKey !== 'YOUR_SUPABASE_ANON_KEY_HERE';
+                addCheck('Supabase 配置有效', hasValidConfig);
+                
+                if (!hasValidConfig) {
+                    addLog('\n⚠️ 警告：Supabase 配置无效！');
+                    addLog('URL: ' + SUPABASE_CONFIG.url);
+                    addLog('Key: ' + (SUPABASE_CONFIG.anonKey ? SUPABASE_CONFIG.anonKey.substring(0, 20) + '...' : 'undefined'));
+                }
+            }
+            
+            addLog('\n=== 诊断完成 ===');
+        }, 2000);
+    </script>
+</body>
+</html>
+
