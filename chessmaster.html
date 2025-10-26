@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Play Chess Master - ArcadeZone</title>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <style>
+        :root {
+            --dark-green: #1a4d2e;
+            --light-green: #4a7c59;
+            --orange: #ff6b35;
+            --dark-orange: #e55a2b;
+            --black: #0a0a0a;
+            --gray: #2d2d2d;
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--dark-green) 0%, var(--black) 100%);
+            font-family: 'Rajdhani', sans-serif;
+            color: white;
+            overflow-x: hidden;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .orbitron { font-family: 'Orbitron', monospace; }
+        
+        .neon-glow {
+            text-shadow: 0 0 10px var(--orange), 0 0 20px var(--orange), 0 0 30px var(--orange);
+        }
+        
+        .nav-link {
+            position: relative;
+            color: white;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        
+        .nav-link:hover {
+            color: var(--orange);
+        }
+        
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--orange);
+            transition: width 0.3s ease;
+        }
+        
+        .nav-link:hover::after {
+            width: 100%;
+        }
+        
+        .game-container {
+            width: 100%;
+            height: calc(100vh - 64px - 100px); /* 减去导航栏和底部高度 */
+            min-height: 600px;
+            border: none;
+            display: block;
+        }
+        
+        /* 手机适配 */
+        @media (max-width: 768px) {
+            .game-container {
+                height: calc(100vh - 64px - 50px); /* 手机上底部更小 */
+                min-height: 500px;
+            }
+            footer {
+                padding: 10px;
+                font-size: 12px;
+            }
+            footer .flex {
+                flex-direction: column;
+                gap: 8px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .game-container {
+                height: calc(100vh - 56px - 40px); /* 更小的导航栏和底部 */
+                min-height: 400px;
+            }
+        }
+        
+        .lang-switch {
+            cursor: pointer;
+            padding: 8px 16px;
+            background: rgba(255, 107, 53, 0.2);
+            border: 2px solid var(--orange);
+            border-radius: 8px;
+            color: white;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        
+        .lang-switch:hover {
+            background: var(--orange);
+            transform: scale(1.05);
+        }
+        
+        footer {
+            background: rgba(0, 0, 0, 0.8);
+            border-top: 2px solid var(--orange);
+            padding: 20px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="bg-black bg-opacity-80 backdrop-blur-sm fixed w-full top-0 z-50 border-b border-orange">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <a href="index.html">
+                        <h1 class="text-2xl font-bold orbitron neon-glow">ArcadeZone</h1>
+                    </a>
+                </div>
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="index.html" class="nav-link font-semibold" data-i18n="nav.home">Home</a>
+                    <a href="games.html" class="nav-link font-semibold" data-i18n="nav.games">Games</a>
+                    <a href="purchase.html" class="nav-link font-semibold" data-i18n="nav.purchase">Purchase</a>
+                    <a href="contact.html" class="nav-link font-semibold" data-i18n="nav.contact">Contact</a>
+                    <button class="lang-switch" onclick="toggleLanguage()">
+                        <span id="lang-display">中文</span>
+                    </button>
+                </div>
+                <!--
+                TODO: 待后端开发完成后启用认证系统
+                <div id="auth-nav-container" class="hidden md:block">
+                    <div class="flex items-center space-x-4">
+                        <button id="login-btn" class="nav-link font-semibold" data-i18n="auth.login">Login</button>
+                        <button id="signup-btn" class="px-4 py-2 rounded-lg font-bold bg-orange hover:bg-dark-orange transition" data-i18n="auth.signup">Sign Up</button>
+                    </div>
+                </div>
+                -->
+                <div class="md:hidden">
+                    <button id="mobile-menu-btn" class="text-white hover:text-orange">
+                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Mobile menu -->
+        <div id="mobile-menu" class="md:hidden hidden bg-black bg-opacity-95">
+            <div class="px-2 pt-2 pb-3 space-y-1">
+                <a href="index.html" class="nav-link block px-3 py-2 font-semibold" data-i18n="nav.home">Home</a>
+                <a href="games.html" class="nav-link block px-3 py-2 font-semibold" data-i18n="nav.games">Games</a>
+                <a href="purchase.html" class="nav-link block px-3 py-2 font-semibold" data-i18n="nav.purchase">Purchase</a>
+                <a href="contact.html" class="nav-link block px-3 py-2 font-semibold" data-i18n="nav.contact">Contact</a>
+                <button class="lang-switch w-full text-left px-3 py-2" onclick="toggleLanguage()">
+                    <span data-i18n="nav.language">Language</span>: <span id="lang-display-mobile">中文</span>
+                </button>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Game Container -->
+    <div style="padding-top: 64px;">
+        <iframe 
+            id="game-frame"
+            src="games/chess.html" 
+            class="game-container"
+            frameborder="0"
+            allowfullscreen>
+        </iframe>
+    </div>
+    
+    <!-- Footer -->
+    <footer>
+        <div class="max-w-7xl mx-auto">
+            <div class="mb-4">
+                <h3 class="text-xl font-bold orbitron neon-glow mb-2">ArcadeZone</h3>
+                <p class="text-gray-400" data-i18n="footer.description">
+                    Your ultimate destination for arcade gaming
+                </p>
+            </div>
+            
+            <div class="flex justify-center space-x-6 mb-4">
+                <a href="index.html" class="nav-link text-sm" data-i18n="nav.home">Home</a>
+                <a href="games.html" class="nav-link text-sm" data-i18n="nav.games">Games</a>
+                <a href="privacy-policy.html" class="nav-link text-sm" data-i18n="footer.privacy">Privacy Policy</a>
+                <a href="user-agreement.html" class="nav-link text-sm" data-i18n="footer.terms">Terms of Service</a>
+            </div>
+            
+            <div class="border-t border-gray-700 pt-4">
+                <p class="text-gray-400 text-sm" data-i18n="footer.copyright">
+                    © 2024 ArcadeZone. All rights reserved.
+                </p>
+            </div>
+        </div>
+    </footer>
+    
+    <!-- Language & Auth Scripts -->
+    <!-- TODO: 待后端开发完成后启用认证系统
+    <script src="auth.js"></script>
+    -->
+    <script>
+        // 语言翻译字典
+        const translations = {
+            en: {
+                'nav.home': 'Home',
+                'nav.games': 'Games',
+                'nav.purchase': 'Purchase',
+                'nav.contact': 'Contact',
+                'nav.language': 'Language',
+                'auth.login': 'Login',
+                'auth.signup': 'Sign Up',
+                'footer.description': 'Your ultimate destination for arcade gaming',
+                'footer.privacy': 'Privacy Policy',
+                'footer.terms': 'Terms of Service',
+                'footer.copyright': '© 2024 ArcadeZone. All rights reserved.'
+            },
+            zh: {
+                'nav.home': '首页',
+                'nav.games': '游戏',
+                'nav.purchase': '购买',
+                'nav.contact': '联系我们',
+                'nav.language': '语言',
+                'auth.login': '登录',
+                'auth.signup': '注册',
+                'footer.description': '您的终极街机游戏目的地',
+                'footer.privacy': '隐私政策',
+                'footer.terms': '服务条款',
+                'footer.copyright': '© 2024 ArcadeZone. 保留所有权利。'
+            }
+        };
+        
+        // 获取当前语言
+        let currentLang = localStorage.getItem('site-language') || 'en';
+        
+        // 应用翻译
+        function applyTranslations(lang) {
+            document.querySelectorAll('[data-i18n]').forEach(element => {
+                const key = element.getAttribute('data-i18n');
+                if (translations[lang] && translations[lang][key]) {
+                    element.textContent = translations[lang][key];
+                }
+            });
+            
+            // 更新语言显示
+            document.getElementById('lang-display').textContent = lang === 'en' ? '中文' : 'EN';
+            const mobileLangDisplay = document.getElementById('lang-display-mobile');
+            if (mobileLangDisplay) {
+                mobileLangDisplay.textContent = lang === 'en' ? '中文' : 'EN';
+            }
+            
+            // 更新 HTML lang 属性
+            document.documentElement.lang = lang;
+            
+            // 通知 iframe 更新语言
+            const iframe = document.getElementById('game-frame');
+            if (iframe && iframe.contentWindow) {
+                iframe.contentWindow.postMessage({ type: 'languageChange', lang: lang }, '*');
+            }
+        }
+        
+        // 切换语言
+        function toggleLanguage() {
+            currentLang = currentLang === 'en' ? 'zh' : 'en';
+            localStorage.setItem('site-language', currentLang);
+            applyTranslations(currentLang);
+        }
+        
+        // 页面加载时应用保存的语言
+        window.addEventListener('DOMContentLoaded', () => {
+            applyTranslations(currentLang);
+        });
+        
+        // 移动菜单切换
+        document.getElementById('mobile-menu-btn').addEventListener('click', () => {
+            document.getElementById('mobile-menu').classList.toggle('hidden');
+        });
+    </script>
+</body>
+</html>
+
