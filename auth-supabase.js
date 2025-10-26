@@ -87,7 +87,8 @@
             return;
         }
         
-        const cacheKey = `user_profile_${window.currentUser.id}`;
+        const userId = window.currentUser.id; // 保存用户ID
+        const cacheKey = `user_profile_${userId}`;
         
         // 1. 先尝试从 localStorage 加载缓存（立即显示）
         const cachedProfile = localStorage.getItem(cacheKey);
@@ -96,7 +97,9 @@
                 window.userProfile = JSON.parse(cachedProfile);
                 console.log('⚡ Using cached profile:', window.userProfile.username);
                 // 立即显示缓存的用户名
-                updateUI(true);
+                if (window.currentUser) { // 检查用户是否还在
+                    updateUI(true);
+                }
             } catch (e) {
                 console.warn('⚠️ Failed to parse cached profile:', e);
             }
@@ -105,7 +108,7 @@
         // 2. 后台异步从数据库加载最新数据
         const fallbackProfile = {
             username: window.currentUser.email.split('@')[0],
-            id: window.currentUser.id
+            id: userId
         };
         
         try {
@@ -119,16 +122,22 @@
             const queryPromise = window.supabase
                 .from('profiles')
                 .select('*')
-                .eq('id', window.currentUser.id)
+                .eq('id', userId)
                 .single();
             
             const { data, error } = await Promise.race([queryPromise, timeoutPromise]);
             
             console.log('📦 Database response:', { data, error });
             
+            // 🔒 关键检查：在异步操作完成后，确认用户没有登出
+            if (!window.currentUser || window.currentUser.id !== userId) {
+                console.log('⚠️ User logged out during profile fetch, aborting UI update');
+                return;
+            }
+            
             if (error) {
                 console.warn('⚠️ Database query failed:', error.message);
-                if (!cachedProfile) {
+                if (!cachedProfile && window.currentUser) {
                     window.userProfile = fallbackProfile;
                     updateUI(true);
                 }
@@ -140,6 +149,12 @@
             localStorage.setItem(cacheKey, JSON.stringify(data));
             console.log('✅ Profile loaded and cached:', window.userProfile.username);
             
+            // 🔒 再次检查用户是否还在
+            if (!window.currentUser || window.currentUser.id !== userId) {
+                console.log('⚠️ User logged out after profile fetch, aborting UI update');
+                return;
+            }
+            
             // 如果profile有变化，更新UI
             if (!cachedProfile || JSON.stringify(data) !== cachedProfile) {
                 updateUI(true);
@@ -147,7 +162,8 @@
             
         } catch (error) {
             console.warn('⚠️ Error loading profile:', error.message);
-            if (!cachedProfile) {
+            // 🔒 检查用户是否还在
+            if (!cachedProfile && window.currentUser && window.currentUser.id === userId) {
                 window.userProfile = fallbackProfile;
                 updateUI(true);
             }
@@ -292,7 +308,7 @@
                 const logoutBtn = container.querySelector('#logout-btn');
                 if (logoutBtn) {
                     logoutBtn.addEventListener('click', handleLogout);
-                    console.log(`   ✅ Logged-in UI inserted for container ${index}`);
+                    console.log(`   ✅ Logged-in UI inserted and event bound for container ${index}`);
                 } else {
                     console.error(`   ❌ Failed to find logout button in container ${index}`);
                 }
