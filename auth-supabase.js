@@ -85,34 +85,42 @@
         
         try {
             console.log('📡 Fetching profile from database...');
+            console.log('   - User ID:', window.currentUser.id);
+            console.log('   - Supabase client:', window.supabase ? 'exists' : 'null');
+            
             const { data, error } = await window.supabase
                 .from('profiles')
                 .select('*')
                 .eq('id', window.currentUser.id)
                 .single();
             
+            console.log('📦 Database response:', { data, error });
+            
             if (error) {
-                console.error('❌ Failed to load profile:', error);
+                console.error('❌ Failed to load profile:', error.message, error.code);
                 // 即使加载失败，也要设置一个默认 profile，让 UI 能显示
                 window.userProfile = {
                     username: window.currentUser.email.split('@')[0],
                     id: window.currentUser.id
                 };
                 console.log('⚠️ Using fallback profile:', window.userProfile.username);
+                console.log('✅ loadUserProfile completed (with fallback)');
                 return;
             }
             
             window.userProfile = data;
-            console.log('✅ Profile loaded successfully:', window.userProfile.username);
+            console.log('✅ Profile loaded successfully:', window.userProfile);
+            console.log('✅ loadUserProfile completed (success)');
             
         } catch (error) {
-            console.error('❌ Error loading profile:', error);
+            console.error('❌ Error loading profile (exception):', error);
             // 设置fallback profile
             window.userProfile = {
                 username: window.currentUser.email.split('@')[0],
                 id: window.currentUser.id
             };
-            console.log('⚠️ Using fallback profile after error:', window.userProfile.username);
+            console.log('⚠️ Using fallback profile after exception:', window.userProfile.username);
+            console.log('✅ loadUserProfile completed (after exception)');
         }
     }
     
