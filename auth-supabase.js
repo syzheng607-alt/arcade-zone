@@ -82,6 +82,15 @@
     // 注册新用户
     async function signUp(email, password, username) {
         try {
+            // 0. reCAPTCHA 验证（如果启用）
+            if (window.RecaptchaHelper && window.RecaptchaHelper.config.enabled) {
+                const captchaResult = await window.RecaptchaHelper.execute('signup');
+                if (!captchaResult.success) {
+                    throw new Error('reCAPTCHA verification failed');
+                }
+                console.log('✅ reCAPTCHA verified');
+            }
+            
             // 1. 创建用户账号
             const { data, error } = await window.supabase.auth.signUp({
                 email: email,

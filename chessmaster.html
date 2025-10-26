@@ -11,6 +11,9 @@
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
+    <!-- Supabase JS SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
     <style>
         :root {
             --dark-green: #1a4d2e;
@@ -136,8 +139,6 @@
                         <span id="lang-display">中文</span>
                     </button>
                 </div>
-                <!--
-                TODO: 待后端开发完成后启用认证系统
                 <div id="auth-nav-container" class="hidden md:block">
                     <div class="flex items-center space-x-4">
                         <button id="login-btn" class="nav-link font-semibold" data-i18n="auth.login">Login</button>
@@ -206,9 +207,10 @@
     </footer>
     
     <!-- Language & Auth Scripts -->
-    <!-- TODO: 待后端开发完成后启用认证系统
-    <script src="auth.js"></script>
-    -->
+    <script src="i18n.js"></script>
+    <script src="supabase-config.js"></script>
+    <script src="supabase-client.js"></script>
+    <script src="auth-supabase.js"></script>
     <script>
         // 语言翻译字典
         const translations = {

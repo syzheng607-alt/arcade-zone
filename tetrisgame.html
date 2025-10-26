@@ -11,6 +11,9 @@
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
+    <!-- Supabase JS SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
     <style>
         :root {
             --dark-green: #1a4d2e;
@@ -135,6 +138,9 @@
                         <span id="lang-display">中文</span>
                     </button>
                 </div>
+                <div id="auth-nav-container" class="hidden md:block">
+                    <!-- Auth buttons will be inserted here -->
+                </div>
                 <div class="md:hidden">
                     <button id="mobile-menu-btn" class="text-white hover:text-orange">
                         <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -195,6 +201,10 @@
         </div>
     </footer>
     
+    <script src="i18n.js"></script>
+    <script src="supabase-config.js"></script>
+    <script src="supabase-client.js"></script>
+    <script src="auth-supabase.js"></script>
     <script>
         const translations = {
             en: {
