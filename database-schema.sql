@@ -3,7 +3,7 @@
 
 -- 1. 用户资料表（扩展 auth.users）
 CREATE TABLE IF NOT EXISTS public.profiles (
-    id UUID REFERENCES auth.users(id) PRIMARY KEY,
+    id UUID REFERENCES auth.users(id) ON DELETE CASCADE PRIMARY KEY,
     username VARCHAR(50) UNIQUE NOT NULL,
     display_name VARCHAR(100),
     avatar_url TEXT,
