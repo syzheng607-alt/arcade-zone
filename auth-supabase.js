@@ -16,20 +16,24 @@
     window.currentUser = null;
     window.authInitialized = false;
     
-    // 初始化认证系统
+    // 初始化认证系统（优化：立即显示 loading，然后异步加载）
     async function initAuth() {
         console.log('🚀 initAuth called');
         try {
-            // 获取当前 session
+            // 获取当前 session（同步从 localStorage 读取，速度快）
             const { data: { session } } = await window.supabase.auth.getSession();
             console.log('📝 Session:', session ? 'Found' : 'Not found');
             
             if (session) {
                 window.currentUser = session.user;
                 console.log('👤 Current user:', window.currentUser.email);
+                
+                // 立即显示 loading 状态，避免闪烁
+                updateUI(true, true); // isLoading = true
+                console.log('⏳ Showing loading UI, loading profile...');
+                
+                // 异步加载 profile（loadUserProfile 内部会调用 updateUI(true)）
                 await loadUserProfile();
-                console.log('📋 Profile loaded, calling updateUI(true)');
-                updateUI(true);
                 console.log('✅ User logged in:', window.currentUser.email);
             } else {
                 window.currentUser = null;
@@ -217,13 +221,13 @@
     }
     
     // 更新UI（确保 DOM 已准备好）
-    function updateUI(isLoggedIn) {
-        console.log('🎨 updateUI called, isLoggedIn:', isLoggedIn, 'userProfile:', window.userProfile, 'isDOMReady:', isDOMReady);
+    function updateUI(isLoggedIn, isLoading = false) {
+        console.log('🎨 updateUI called, isLoggedIn:', isLoggedIn, 'isLoading:', isLoading, 'userProfile:', window.userProfile, 'isDOMReady:', isDOMReady);
         
         // 如果 DOM 还没准备好，延迟执行
         if (!isDOMReady) {
             console.log('⏳ DOM not ready yet, queuing UI update...');
-            ensureDOMReady(() => updateUI(isLoggedIn));
+            ensureDOMReady(() => updateUI(isLoggedIn, isLoading));
             return;
         }
         
@@ -238,7 +242,15 @@
             container.classList.remove('hidden');
             console.log(`   - After remove 'hidden':`, container.classList.contains('hidden'));
             
-            if (isLoggedIn && window.userProfile) {
+            if (isLoading) {
+                // Loading 状态
+                container.innerHTML = `
+                    <div class="flex items-center space-x-4">
+                        <span class="nav-link font-semibold opacity-50">Loading...</span>
+                    </div>
+                `;
+                console.log(`   ⏳ Loading UI inserted for container ${index}`);
+            } else if (isLoggedIn && window.userProfile) {
                 // 已登录状态
                 container.innerHTML = `
                     <div class="flex items-center space-x-4">
