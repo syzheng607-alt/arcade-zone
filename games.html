@@ -15,6 +15,9 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/typed.js/2.0.12/typed.min.js"></script>
     
+    <!-- Supabase JS SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
     <style>
         :root {
             --dark-green: #1a4d2e;
@@ -230,12 +233,9 @@
                         </button>
                     </div>
                 </div>
-                <!--
-                TODO: 待后端开发完成后启用认证系统
                 <div id="auth-nav-container">
-                    Auth buttons will be inserted here
+                    <!-- Auth buttons will be inserted here -->
                 </div>
-                -->
                 <div class="md:hidden">
                     <button id="mobile-menu-btn" class="text-white hover:text-orange">
                         <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -743,10 +743,11 @@
         </div>
     </div>
     
+    <script src="i18n.js"></script>
+    <script src="supabase-config.js"></script>
+    <script src="supabase-client.js"></script>
+    <script src="auth-supabase.js"></script>
     <script src="main.js"></script>
-    <!-- TODO: 待后端开发完成后启用认证系统
-    <script src="auth.js"></script>
-    -->
     <script>
         // Games page specific functionality
         document.addEventListener('DOMContentLoaded', function() {
@@ -852,9 +853,5 @@
             });
         }
     </script>
-    <script src="i18n.js"></script>
-    <!-- TODO: 待后端开发完成后启用认证系统
-    <script src="auth.js"></script>
-    -->
 </body>
 </html>
