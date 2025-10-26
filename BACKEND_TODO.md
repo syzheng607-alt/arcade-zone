@@ -163,7 +163,7 @@ GET    /api/leaderboard/:game   - 获取排行榜
   - 取消注释 auth-nav-container
   - 取消注释 `<script src="auth.js"></script>`（2处）
 
-- [ ] **play.html**
+- [ ] **chessmaster.html** (formerly play.html)
   - 取消注释 auth-nav-container
   - 取消注释 `<script src="auth.js"></script>`
 
