@@ -1,0 +1,61 @@
+/* 认证UI固定布局 - 防止闪烁和移动 */
+
+#auth-nav-container {
+    /* 固定最小宽度，防止内容变化时导航栏抖动 */
+    min-width: 220px;
+    width: 220px;
+    
+    /* 内容右对齐 */
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    
+    /* 防止内容溢出 */
+    overflow: hidden;
+}
+
+/* 确保内部 flex 容器也不会改变宽度 */
+#auth-nav-container > div {
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+/* Loading 状态的骨架屏样式 */
+#auth-nav-container .opacity-50 {
+    animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 0.5; }
+    50% { opacity: 0.3; }
+}
+
+/* 语言切换按钮 */
+.lang-switch {
+    cursor: pointer;
+    padding: 8px 16px;
+    background: rgba(255, 107, 53, 0.2);
+    border: 2px solid var(--orange, #ff6b35);
+    border-radius: 8px;
+    color: white;
+    font-weight: bold;
+    transition: all 0.3s;
+    white-space: nowrap;
+}
+
+.lang-switch:hover {
+    background: var(--orange, #ff6b35);
+    transform: scale(1.05);
+}
+
+/* 响应式调整 */
+@media (max-width: 768px) {
+    #auth-nav-container {
+        min-width: auto;
+        width: 100%;
+        justify-content: center;
+    }
+}
+
