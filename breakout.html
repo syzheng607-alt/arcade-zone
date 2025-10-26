@@ -193,12 +193,41 @@
         .win { color: #4fff4f; }
         .lose { color: #ff6b35; }
         
+        /* Mobile Touch Hint */
+        .touch-hint {
+            display: none;
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 107, 53, 0.9);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-size: 14px;
+            font-weight: bold;
+            z-index: 1000;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: translateX(-50%) scale(1); }
+            50% { opacity: 0.8; transform: translateX(-50%) scale(1.05); }
+        }
+        
         @media (max-width: 768px) {
-            body { padding: 10px; }
+            body { 
+                padding: 10px;
+                padding-bottom: 80px;
+            }
             h1 { font-size: 32px; }
             .container { flex-direction: column; gap: 20px; }
-            canvas { width: 100% !important; height: auto !important; }
+            canvas { 
+                width: 100% !important; 
+                height: auto !important;
+                touch-action: none;
+            }
             .controls { min-width: unset; width: 100%; }
+            .touch-hint { display: block; }
         }
     </style>
 </head>
@@ -262,6 +291,9 @@
             <button id="restartBtn">PLAY AGAIN</button>
         </div>
     </div>
+    
+    <!-- Mobile Touch Hint -->
+    <div class="touch-hint" id="touchHint">👆 Touch to move paddle & launch ball</div>
     
     <script>
         const canvas = document.getElementById('gameCanvas');
@@ -504,6 +536,8 @@
             init();
             gameRunning = true;
             gamePaused = false;
+            touchHintShown = true;
+            document.getElementById('touchHint').style.display = 'block';
             document.getElementById('startBtn').disabled = true;
             document.getElementById('pauseBtn').disabled = false;
             requestAnimationFrame(update);
@@ -573,19 +607,52 @@
             }
         });
         
-        // Touch control
+        // Touch control - Enhanced for mobile
+        let touchHintShown = true;
+        
         canvas.addEventListener('touchmove', (e) => {
             if (!gameRunning || gamePaused) return;
             e.preventDefault();
+            
+            // Hide touch hint on first interaction
+            if (touchHintShown) {
+                document.getElementById('touchHint').style.display = 'none';
+                touchHintShown = false;
+            }
+            
             const rect = canvas.getBoundingClientRect();
-            paddle.x = e.touches[0].clientX - rect.left - paddle.width / 2;
+            const scaleX = canvas.width / rect.width;
+            const touchX = (e.touches[0].clientX - rect.left) * scaleX;
+            
+            paddle.x = touchX - paddle.width / 2;
             paddle.x = Math.max(0, Math.min(canvas.width - paddle.width, paddle.x));
+            
+            // Move ball with paddle before launch
+            if (!ball.launched) {
+                ball.x = paddle.x + paddle.width / 2;
+            }
         });
         
-        canvas.addEventListener('touchstart', () => {
-            if (gameRunning && !gamePaused) {
-                launchBall();
+        canvas.addEventListener('touchstart', (e) => {
+            if (!gameRunning || gamePaused) return;
+            e.preventDefault();
+            
+            // Hide touch hint on first interaction
+            if (touchHintShown) {
+                document.getElementById('touchHint').style.display = 'none';
+                touchHintShown = false;
             }
+            
+            // Launch ball on tap
+            launchBall();
+            
+            // Also update paddle position on tap
+            const rect = canvas.getBoundingClientRect();
+            const scaleX = canvas.width / rect.width;
+            const touchX = (e.touches[0].clientX - rect.left) * scaleX;
+            
+            paddle.x = touchX - paddle.width / 2;
+            paddle.x = Math.max(0, Math.min(canvas.width - paddle.width, paddle.x));
         });
         
         document.getElementById('startBtn').addEventListener('click', startGame);

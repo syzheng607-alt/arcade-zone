@@ -213,12 +213,75 @@
             margin-bottom: 20px;
         }
         
+        /* Mobile Touch Controls */
+        .mobile-controls {
+            display: none;
+            position: fixed;
+            bottom: 20px;
+            left: 0;
+            right: 0;
+            padding: 0 20px;
+            z-index: 1000;
+        }
+        .control-row {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        .control-btn {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, rgba(255, 107, 53, 0.8), rgba(247, 147, 30, 0.8));
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 12px;
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+            user-select: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 15px rgba(255, 107, 53, 0.4);
+            transition: all 0.1s;
+            touch-action: manipulation;
+        }
+        .control-btn:active {
+            transform: scale(0.95);
+            box-shadow: 0 2px 8px rgba(255, 107, 53, 0.6);
+        }
+        .control-btn.wide {
+            width: 155px;
+        }
+        .control-btn.rotate {
+            background: linear-gradient(135deg, rgba(74, 124, 89, 0.8), rgba(58, 180, 255, 0.8));
+        }
+        
         @media (max-width: 768px) {
-            body { padding: 10px; }
+            body { 
+                padding: 10px;
+                padding-bottom: 200px;
+            }
             h1 { font-size: 32px; }
-            .container { flex-direction: column; gap: 20px; }
+            .container { 
+                flex-direction: column; 
+                gap: 20px;
+            }
             canvas { width: 100% !important; height: auto !important; }
             .controls { min-width: unset; width: 100%; }
+            .mobile-controls { display: block; }
+        }
+        
+        @media (max-width: 480px) {
+            .control-btn {
+                width: 60px;
+                height: 60px;
+                font-size: 20px;
+            }
+            .control-btn.wide {
+                width: 135px;
+            }
         }
     </style>
 </head>
@@ -286,6 +349,21 @@
             <p class="score-value" id="finalScore" style="font-size: 48px;">0</p>
             <p style="margin: 10px 0; color: #cbd5e1;">Level <span id="finalLevel">1</span> | <span id="finalLines">0</span> Lines</p>
             <button id="restartBtn">PLAY AGAIN</button>
+        </div>
+    </div>
+    
+    <!-- Mobile Touch Controls -->
+    <div class="mobile-controls">
+        <div class="control-row">
+            <div class="control-btn rotate" id="rotateBtn">↻</div>
+        </div>
+        <div class="control-row">
+            <div class="control-btn" id="leftBtn">◄</div>
+            <div class="control-btn" id="downBtn">▼</div>
+            <div class="control-btn" id="rightBtn">►</div>
+        </div>
+        <div class="control-row">
+            <div class="control-btn wide" id="dropBtn">DROP</div>
         </div>
     </div>
     
@@ -626,6 +704,61 @@
             document.getElementById('gameOverModal').style.display = 'none';
             startGame();
         });
+        
+        // Mobile Touch Controls
+        const leftBtn = document.getElementById('leftBtn');
+        const rightBtn = document.getElementById('rightBtn');
+        const downBtn = document.getElementById('downBtn');
+        const rotateBtn = document.getElementById('rotateBtn');
+        const dropBtn = document.getElementById('dropBtn');
+        
+        leftBtn.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            if (gameRunning && !gamePaused) {
+                move(-1);
+                drawBoard();
+            }
+        });
+        
+        rightBtn.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            if (gameRunning && !gamePaused) {
+                move(1);
+                drawBoard();
+            }
+        });
+        
+        downBtn.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            if (gameRunning && !gamePaused) {
+                drop();
+                updateDisplay();
+                drawBoard();
+            }
+        });
+        
+        rotateBtn.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            if (gameRunning && !gamePaused) {
+                rotate();
+                drawBoard();
+            }
+        });
+        
+        dropBtn.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            if (gameRunning && !gamePaused) {
+                hardDrop();
+                updateDisplay();
+            }
+        });
+        
+        // Also support click for testing
+        leftBtn.addEventListener('click', () => { if (gameRunning && !gamePaused) { move(-1); drawBoard(); } });
+        rightBtn.addEventListener('click', () => { if (gameRunning && !gamePaused) { move(1); drawBoard(); } });
+        downBtn.addEventListener('click', () => { if (gameRunning && !gamePaused) { drop(); updateDisplay(); drawBoard(); } });
+        rotateBtn.addEventListener('click', () => { if (gameRunning && !gamePaused) { rotate(); drawBoard(); } });
+        dropBtn.addEventListener('click', () => { if (gameRunning && !gamePaused) { hardDrop(); updateDisplay(); } });
         
         // Initial draw
         drawBoard();
