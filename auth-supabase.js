@@ -18,22 +18,28 @@
     
     // 初始化认证系统
     async function initAuth() {
+        console.log('🚀 initAuth called');
         try {
             // 获取当前 session
             const { data: { session } } = await window.supabase.auth.getSession();
+            console.log('📝 Session:', session ? 'Found' : 'Not found');
             
             if (session) {
                 window.currentUser = session.user;
+                console.log('👤 Current user:', window.currentUser.email);
                 await loadUserProfile();
+                console.log('📋 Profile loaded, calling updateUI(true)');
                 updateUI(true);
                 console.log('✅ User logged in:', window.currentUser.email);
             } else {
                 window.currentUser = null;
+                console.log('📋 No session, calling updateUI(false)');
                 updateUI(false);
                 console.log('ℹ️ No active session');
             }
             
             window.authInitialized = true;
+            console.log('✅ Auth initialization complete');
             
         } catch (error) {
             console.error('❌ Auth initialization error:', error);
@@ -42,16 +48,22 @@
     
     // 监听认证状态变化
     window.supabase.auth.onAuthStateChange(async (event, session) => {
-        console.log('🔄 Auth event:', event);
+        console.log('🔄 Auth event:', event, 'Session:', session ? 'exists' : 'null');
         
         if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+            console.log('📝 Handling SIGNED_IN/TOKEN_REFRESHED');
             window.currentUser = session.user;
             await loadUserProfile();
+            console.log('📋 Profile loaded in event handler, calling updateUI(true)');
             updateUI(true);
         } else if (event === 'SIGNED_OUT') {
+            console.log('📝 Handling SIGNED_OUT');
             window.currentUser = null;
             window.userProfile = null;
+            console.log('📋 Calling updateUI(false)');
             updateUI(false);
+        } else {
+            console.log('⚠️ Unhandled auth event:', event);
         }
     });
     
