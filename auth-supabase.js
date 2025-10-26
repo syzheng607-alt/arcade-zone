@@ -220,8 +220,6 @@
                     console.error(`   ❌ Failed to find login button in container ${index}`);
                 }
                 if (signupBtn) signupBtn.addEventListener('click', showSignupModal);
-            } else {
-                console.log(`   ⚠️ Skipping container ${index}: isLoggedIn=${isLoggedIn}, hasProfile=${!!window.userProfile}`);
             }
         });
     }
