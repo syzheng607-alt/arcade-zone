@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phaser Demo - Coin Collector</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            color: white;
+        }
+        h1 {
+            margin-bottom: 20px;
+            font-size: 36px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        #game-container {
+            border: 4px solid white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        .instructions {
+            margin-top: 20px;
+            text-align: center;
+            background: rgba(255,255,255,0.1);
+            padding: 15px 30px;
+            border-radius: 8px;
+            backdrop-filter: blur(10px);
+        }
+        .instructions p {
+            margin: 5px 0;
+            font-size: 14px;
+        }
+        .score-display {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(0,0,0,0.7);
+            padding: 15px 25px;
+            border-radius: 10px;
+            font-size: 24px;
+            font-weight: bold;
+            z-index: 1000;
+        }
+    </style>
+    <!-- 加载 Phaser 3 -->
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.70.0/dist/phaser.min.js"></script>
+</head>
+<body>
+    <h1>🎮 Phaser Demo - Coin Collector</h1>
+    
+    <div id="game-container"></div>
+    
+    <div class="instructions">
+        <p><strong>Controls:</strong></p>
+        <p>← → Arrow Keys to Move | Space to Jump</p>
+        <p>Collect coins and avoid enemies!</p>
+    </div>
+    
+    <script>
+        // Phaser 游戏配置
+        const config = {
+            type: Phaser.AUTO, // 自动选择 WebGL 或 Canvas
+            width: 800,
+            height: 600,
+            parent: 'game-container',
+            backgroundColor: '#87CEEB',
+            physics: {
+                default: 'arcade',
+                arcade: {
+                    gravity: { y: 800 },
+                    debug: false
+                }
+            },
+            scene: {
+                preload: preload,
+                create: create,
+                update: update
+            }
+        };
+        
+        const game = new Phaser.Game(config);
+        
+        // 游戏变量
+        let player;
+        let platforms;
+        let coins;
+        let enemies;
+        let cursors;
+        let score = 0;
+        let scoreText;
+        let gameOver = false;
+        
+        // 预加载资源（这里我们用简单的图形代替）
+        function preload() {
+            // 在实际项目中，你会这样加载图片：
+            // this.load.image('player', 'assets/player.png');
+            // this.load.image('coin', 'assets/coin.png');
+        }
+        
+        // 创建游戏对象
+        function create() {
+            // 创建平台组
+            platforms = this.physics.add.staticGroup();
+            
+            // 地面
+            const ground = platforms.create(400, 580, null);
+            ground.setDisplaySize(800, 40);
+            ground.setTint(0x00aa00);
+            ground.refreshBody();
+            
+            // 几个浮空平台
+            const platform1 = platforms.create(600, 450, null);
+            platform1.setDisplaySize(200, 20);
+            platform1.setTint(0x8b4513);
+            platform1.refreshBody();
+            
+            const platform2 = platforms.create(200, 350, null);
+            platform2.setDisplaySize(200, 20);
+            platform2.setTint(0x8b4513);
+            platform2.refreshBody();
+            
+            const platform3 = platforms.create(500, 250, null);
+            platform3.setDisplaySize(150, 20);
+            platform3.setTint(0x8b4513);
+            platform3.refreshBody();
+            
+            // 创建玩家
+            player = this.physics.add.sprite(100, 450, null);
+            player.setDisplaySize(32, 48);
+            player.setTint(0x0000ff); // 蓝色方块代表玩家
+            player.setBounce(0.2);
+            player.setCollideWorldBounds(true);
+            
+            // 玩家与平台碰撞
+            this.physics.add.collider(player, platforms);
+            
+            // 创建金币组
+            coins = this.physics.add.group({
+                key: null,
+                repeat: 11,
+                setXY: { x: 12, y: 0, stepX: 70 }
+            });
+            
+            coins.children.iterate(function (child) {
+                child.setDisplaySize(20, 20);
+                child.setTint(0xffff00); // 黄色圆形代表金币
+                child.setBounceY(Phaser.Math.FloatBetween(0.4, 0.8));
+            });
+            
+            this.physics.add.collider(coins, platforms);
+            
+            // 创建敌人组
+            enemies = this.physics.add.group();
+            
+            // 添加几个敌人
+            const enemy1 = enemies.create(300, 400, null);
+            enemy1.setDisplaySize(32, 32);
+            enemy1.setTint(0xff0000); // 红色方块代表敌人
+            enemy1.setBounce(1);
+            enemy1.setCollideWorldBounds(true);
+            enemy1.setVelocity(Phaser.Math.Between(-200, 200), 20);
+            
+            const enemy2 = enemies.create(700, 300, null);
+            enemy2.setDisplaySize(32, 32);
+            enemy2.setTint(0xff0000);
+            enemy2.setBounce(1);
+            enemy2.setCollideWorldBounds(true);
+            enemy2.setVelocity(Phaser.Math.Between(-200, 200), 20);
+            
+            this.physics.add.collider(enemies, platforms);
+            
+            // 玩家收集金币
+            this.physics.add.overlap(player, coins, collectCoin, null, this);
+            
+            // 玩家碰到敌人
+            this.physics.add.collider(player, enemies, hitEnemy, null, this);
+            
+            // 键盘输入
+            cursors = this.input.keyboard.createCursorKeys();
+            
+            // 分数文字
+            scoreText = this.add.text(16, 16, 'Score: 0', {
+                fontSize: '32px',
+                fill: '#000'
+            });
+        }
+        
+        // 游戏循环
+        function update() {
+            if (gameOver) {
+                return;
+            }
+            
+            // 玩家移动控制
+            if (cursors.left.isDown) {
+                player.setVelocityX(-160);
+            } else if (cursors.right.isDown) {
+                player.setVelocityX(160);
+            } else {
+                player.setVelocityX(0);
+            }
+            
+            // 跳跃（只有在地面上才能跳）
+            if (cursors.up.isDown && player.body.touching.down) {
+                player.setVelocityY(-500);
+            }
+            
+            // 空格键也可以跳跃
+            if (cursors.space.isDown && player.body.touching.down) {
+                player.setVelocityY(-500);
+            }
+        }
+        
+        // 收集金币
+        function collectCoin(player, coin) {
+            coin.disableBody(true, true);
+            
+            score += 10;
+            scoreText.setText('Score: ' + score);
+            
+            // 如果所有金币都收集完了，生成新的金币和更多敌人
+            if (coins.countActive(true) === 0) {
+                coins.children.iterate(function (child) {
+                    child.enableBody(true, child.x, 0, true, true);
+                });
+                
+                // 添加一个新敌人
+                const x = (player.x < 400) ? Phaser.Math.Between(400, 800) : Phaser.Math.Between(0, 400);
+                const enemy = enemies.create(x, 16, null);
+                enemy.setDisplaySize(32, 32);
+                enemy.setTint(0xff0000);
+                enemy.setBounce(1);
+                enemy.setCollideWorldBounds(true);
+                enemy.setVelocity(Phaser.Math.Between(-200, 200), 20);
+                
+                this.physics.add.collider(enemy, platforms);
+            }
+        }
+        
+        // 碰到敌人
+        function hitEnemy(player, enemy) {
+            this.physics.pause();
+            player.setTint(0xff0000);
+            gameOver = true;
+            
+            // 显示游戏结束文字
+            const gameOverText = this.add.text(400, 300, 'GAME OVER!', {
+                fontSize: '64px',
+                fill: '#ff0000',
+                fontStyle: 'bold'
+            });
+            gameOverText.setOrigin(0.5);
+            
+            const restartText = this.add.text(400, 370, 'Press R to Restart', {
+                fontSize: '32px',
+                fill: '#000'
+            });
+            restartText.setOrigin(0.5);
+            
+            // R键重启
+            this.input.keyboard.once('keydown-R', () => {
+                this.scene.restart();
+                score = 0;
+                gameOver = false;
+            });
+        }
+        
+        console.log('Phaser game loaded! 🎮');
+        console.log('Phaser version:', Phaser.VERSION);
+    </script>
+</body>
+</html>
+
