@@ -3,10 +3,10 @@
 
 const SUPABASE_CONFIG = {
     // 你的 Supabase 项目 URL（类似 https://xxxxx.supabase.co）
-    url: 'YOUR_SUPABASE_URL_HERE',
+    url: 'https://upiuuwzydeqbqeovjrvc.supabase.co',
     
     // 你的 Supabase anon/public key（一串很长的字符串）
-    anonKey: 'YOUR_SUPABASE_ANON_KEY_HERE'
+    anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVwaXV1d3p5ZGVxYnFlb3ZqcnZjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE0NjMzMzIsImV4cCI6MjA3NzAzOTMzMn0.bDsqb39r40FpDrXG7IpJV09rqkm_cKZnWMYq2OuxUdM'
 };
 
 // 导出配置
