@@ -196,7 +196,6 @@
                 } else {
                     console.error(`   ❌ Failed to find logout button in container ${index}`);
                 }
-                
             } else {
                 // 未登录状态
                 container.innerHTML = `
