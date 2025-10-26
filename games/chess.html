@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>国际象棋 - 在线对战（含AI）</title>
+    
+    <!-- Supabase JS SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { display: flex; flex-direction: column; align-items: center; min-height: 100vh; padding: 24px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', Arial, 'Noto Sans', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif; background: radial-gradient(1200px 600px at 50% -10%, #1f2a44, #0f172a); color: #e5e7eb; }
@@ -196,6 +200,61 @@
         }
     </style>
     <script type="module">
+        // === Supabase 配置 ===
+        let supabaseClient = null;
+        let currentUser = null;
+        let gameStartTime = null;
+        let totalMoves = 0;
+        
+        // 从父窗口获取 Supabase 配置
+        if (window.parent && window.parent.SUPABASE_CONFIG) {
+            const config = window.parent.SUPABASE_CONFIG;
+            const { createClient } = supabase;
+            supabaseClient = createClient(config.url, config.anonKey);
+            
+            // 获取当前用户
+            supabaseClient.auth.getSession().then(({ data: { session } }) => {
+                if (session) {
+                    currentUser = session.user;
+                    console.log('✅ Chess game connected to Supabase, user:', currentUser.email);
+                }
+            });
+        }
+        
+        // 保存游戏记录到数据库
+        async function saveGameRecord(result, winner) {
+            if (!supabaseClient || !currentUser) {
+                console.log('⚠️ Not logged in, game record not saved');
+                return;
+            }
+            
+            try {
+                const duration = gameStartTime ? Math.floor((Date.now() - gameStartTime) / 1000) : 0;
+                const moveHistory = game.history();
+                
+                const { data, error } = await supabaseClient
+                    .from('game_records')
+                    .insert([{
+                        user_id: currentUser.id,
+                        game_type: 'chess',
+                        score: totalMoves,
+                        duration: duration,
+                        result: result,  // 'win', 'loss', 'draw'
+                        moves: {
+                            history: moveHistory,
+                            total_moves: totalMoves,
+                            winner: winner,
+                            pgn: game.pgn()
+                        }
+                    }]);
+                
+                if (error) throw error;
+                console.log('✅ Game record saved successfully');
+            } catch (err) {
+                console.error('❌ Failed to save game record:', err);
+            }
+        }
+        
         // 多语言支持
         let currentLang = localStorage.getItem('chess-language') || 'en';
         
@@ -523,7 +582,7 @@
             const isPromotion = moveInfo && moveInfo.flags.includes('p');
             if(isPromotion){ showPromotion().then(prom=>{ tryMove(selectedSq,sq,prom); }); } else { tryMove(selectedSq,sq,undefined); }
         });
-        function tryMove(from,to,promotion){ const res = game.move({from,to,promotion}); if(res){ selectedSq=null; clearHighlights(); render(); maybeAIMove(); } }
+        function tryMove(from,to,promotion){ const res = game.move({from,to,promotion}); if(res){ totalMoves++; selectedSq=null; clearHighlights(); render(); maybeAIMove(); } }
         function showPromotion(){ return new Promise(resolve=>{ promoMask.style.display='grid';
             const onClick=(e)=>{ const el=e.target.closest('.choice'); if(!el) return; const q=el.getAttribute('data-q'); cleanup(); resolve(q); };
             function cleanup(){ promoMask.style.display='none'; promoMask.removeEventListener('click', onClick); }
@@ -553,6 +612,12 @@
                             : `${winner} wins!\n${loser} is checkmated`;
                         showGameOver('🎉', title, msg);
                         console.log('✅ CHECKMATE!', winner, 'wins!');
+                        
+                        // 保存游戏记录
+                        const humanSide = document.getElementById('side').value;
+                        const winnerSide = game.turn() === 'w' ? 'b' : 'w';
+                        const result = (winnerSide === humanSide) ? 'win' : 'loss';
+                        saveGameRecord(result, winner);
                     }, 300);
                 }
             } else if (game.isDraw()) {
@@ -566,6 +631,9 @@
                         const msg = currentLang === 'zh' ? '和棋 - 平局' : 'Draw - Stalemate';
                         showGameOver('🤝', title, msg);
                         console.log('✅ DRAW!');
+                        
+                        // 保存游戏记录
+                        saveGameRecord('draw', 'Draw');
                     }, 300);
                 }
             } else if (game.inCheck()) {
@@ -576,10 +644,24 @@
                 statusEl.textContent = statusText + ` · ${game.turn() === 'w' ? t('turnWhite') : t('turnBlack')}`;
             }
         }
-        document.getElementById('new').onclick = ()=>{ gameEnded = false; game.reset(); render(); maybeAIMove(true); };
-        document.getElementById('undo').onclick = ()=>{ game.undo(); game.undo(); render(); };
+        document.getElementById('new').onclick = ()=>{ 
+            gameEnded = false; 
+            game.reset(); 
+            gameStartTime = Date.now(); 
+            totalMoves = 0;
+            render(); 
+            maybeAIMove(true); 
+        };
+        document.getElementById('undo').onclick = ()=>{ game.undo(); game.undo(); totalMoves = Math.max(0, totalMoves - 2); render(); };
         document.getElementById('opponent').onchange = ()=>{ render(); maybeAIMove(true); };
-        document.getElementById('side').onchange = ()=>{ gameEnded = false; game.reset(); render(); maybeAIMove(true); };
+        document.getElementById('side').onchange = ()=>{ 
+            gameEnded = false; 
+            game.reset(); 
+            gameStartTime = Date.now(); 
+            totalMoves = 0;
+            render(); 
+            maybeAIMove(true); 
+        };
 
         // Stockfish 集成
         const engine = createStockfishWorker();
@@ -680,10 +762,24 @@
                 document.getElementById('depth').value = savedValues.depth;
                 
                 // 重新绑定事件
-                document.getElementById('new').onclick = ()=>{ gameEnded = false; game.reset(); render(); maybeAIMove(true); };
-                document.getElementById('undo').onclick = ()=>{ game.undo(); game.undo(); render(); };
+                document.getElementById('new').onclick = ()=>{ 
+                    gameEnded = false; 
+                    game.reset(); 
+                    gameStartTime = Date.now(); 
+                    totalMoves = 0;
+                    render(); 
+                    maybeAIMove(true); 
+                };
+                document.getElementById('undo').onclick = ()=>{ game.undo(); game.undo(); totalMoves = Math.max(0, totalMoves - 2); render(); };
                 document.getElementById('opponent').onchange = ()=>{ render(); maybeAIMove(true); };
-                document.getElementById('side').onchange = ()=>{ gameEnded = false; game.reset(); render(); maybeAIMove(true); };
+                document.getElementById('side').onchange = ()=>{ 
+                    gameEnded = false; 
+                    game.reset(); 
+                    gameStartTime = Date.now(); 
+                    totalMoves = 0;
+                    render(); 
+                    maybeAIMove(true); 
+                };
                 
                 // 更新状态显示
                 updateStatus();
@@ -698,6 +794,9 @@
             currentLang = parentLang;
             localStorage.setItem('chess-language', currentLang);
         }
+        
+        // 初始化游戏开始时间
+        gameStartTime = Date.now();
     </script>
 </head>
 <body></body>
