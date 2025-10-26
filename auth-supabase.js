@@ -75,7 +75,7 @@
         }
     });
     
-    // 加载用户资料
+    // 加载用户资料（带超时保护）
     async function loadUserProfile() {
         console.log('🔄 loadUserProfile called, currentUser:', window.currentUser?.email);
         if (!window.currentUser) {
@@ -83,44 +83,55 @@
             return;
         }
         
+        // 设置默认 fallback profile
+        const fallbackProfile = {
+            username: window.currentUser.email.split('@')[0],
+            id: window.currentUser.id
+        };
+        
         try {
             console.log('📡 Fetching profile from database...');
             console.log('   - User ID:', window.currentUser.id);
             console.log('   - Supabase client:', window.supabase ? 'exists' : 'null');
             
-            const { data, error } = await window.supabase
+            // 使用 Promise.race 添加 3 秒超时
+            const timeoutPromise = new Promise((_, reject) => {
+                setTimeout(() => reject(new Error('Database query timeout after 3s')), 3000);
+            });
+            
+            const queryPromise = window.supabase
                 .from('profiles')
                 .select('*')
                 .eq('id', window.currentUser.id)
                 .single();
             
+            const { data, error } = await Promise.race([queryPromise, timeoutPromise]);
+            
             console.log('📦 Database response:', { data, error });
             
             if (error) {
                 console.error('❌ Failed to load profile:', error.message, error.code);
-                // 即使加载失败，也要设置一个默认 profile，让 UI 能显示
-                window.userProfile = {
-                    username: window.currentUser.email.split('@')[0],
-                    id: window.currentUser.id
-                };
+                window.userProfile = fallbackProfile;
                 console.log('⚠️ Using fallback profile:', window.userProfile.username);
                 console.log('✅ loadUserProfile completed (with fallback)');
+                // 重要：调用 updateUI 显示用户名
+                updateUI(true);
                 return;
             }
             
             window.userProfile = data;
             console.log('✅ Profile loaded successfully:', window.userProfile);
             console.log('✅ loadUserProfile completed (success)');
+            // 重要：调用 updateUI 显示用户名
+            updateUI(true);
             
         } catch (error) {
-            console.error('❌ Error loading profile (exception):', error);
-            // 设置fallback profile
-            window.userProfile = {
-                username: window.currentUser.email.split('@')[0],
-                id: window.currentUser.id
-            };
+            console.error('❌ Error loading profile (exception):', error.message);
+            window.userProfile = fallbackProfile;
             console.log('⚠️ Using fallback profile after exception:', window.userProfile.username);
             console.log('✅ loadUserProfile completed (after exception)');
+            // 重要：即使出错也调用 updateUI 显示用户名
+            updateUI(true);
         }
     }
     
