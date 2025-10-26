@@ -246,9 +246,18 @@
             
             if (result.success) {
                 document.body.removeChild(modal);
-                showNotification('登录成功！', 'success');
+                showNotification('✅ Login successful!', 'success');
             } else {
-                errorDiv.textContent = result.error;
+                // 特殊处理邮箱未验证的错误
+                if (result.error.includes('Email not confirmed')) {
+                    errorDiv.innerHTML = `
+                        <p class="font-bold mb-2">❌ Email Not Verified</p>
+                        <p class="text-sm">Please check your email inbox (and spam folder) for the verification link.</p>
+                        <p class="text-sm mt-2">📧 Can't find it? Check your spam folder or contact support.</p>
+                    `;
+                } else {
+                    errorDiv.textContent = result.error;
+                }
                 errorDiv.classList.remove('hidden');
             }
         });
@@ -318,7 +327,11 @@
             
             if (result.success) {
                 document.body.removeChild(modal);
-                showNotification('注册成功！欢迎加入 ArcadeZone！', 'success');
+                showNotification('✅ Registration successful! Please check your email to verify your account before logging in.', 'success');
+                // 显示详细说明
+                setTimeout(() => {
+                    alert('📧 Verification Email Sent!\n\nPlease check your email inbox (and spam folder) for a verification link from Supabase.\n\nYou must verify your email before you can log in.');
+                }, 500);
             } else {
                 errorDiv.textContent = result.error;
                 errorDiv.classList.remove('hidden');
