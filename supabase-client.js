@@ -33,6 +33,9 @@ class SupabaseClient {
             SUPABASE_CONFIG.anonKey
         );
 
+        // 暴露给 auth-supabase.js 使用
+        window.supabase = this.client;
+
         console.log('✅ Supabase client initialized');
 
         // 检查当前用户会话
