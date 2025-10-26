@@ -71,6 +71,19 @@ function initGameBlocks() {
     const gameBlocks = document.querySelectorAll('.game-block');
     const playButtons = document.querySelectorAll('.play-button');
     
+    // Make entire game block clickable
+    gameBlocks.forEach(block => {
+        const href = block.getAttribute('data-href');
+        if (href) {
+            block.addEventListener('click', function(e) {
+                // Don't trigger if clicking the play button directly (it has its own link)
+                if (!e.target.closest('.play-button')) {
+                    window.location.href = href;
+                }
+            });
+        }
+    });
+    
     // Add hover effects with Anime.js
     gameBlocks.forEach((block, index) => {
         block.addEventListener('mouseenter', function() {
